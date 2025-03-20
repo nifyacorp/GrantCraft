@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GrantCraft API Reference - Core Modules</title>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-light: #93c5fd;
+      --secondary: #64748b;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --code-bg: #f1f5f9;
+      --code-text: #334155;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      line-height: 1.6;
+      color: var(--text-dark);
+      background: var(--bg-light);
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: white;
+      border-right: 1px solid var(--border);
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: var(--text-dark);
+    }
+
+    .logo img {
+      margin-right: 0.75rem;
+    }
+
+    .nav-group {
+      margin-bottom: 2rem;
+    }
+
+    .nav-title {
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-light);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-items {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      display: block;
+      padding: 0.5rem 0;
+      color: var(--text-dark);
+      font-size: 0.875rem;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .nav-link.active {
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .main-content {
+      flex: 1;
+      margin-left: 280px;
+      padding: 2rem;
+      max-width: 900px;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    h4 {
+      font-size: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    p {
+      margin-bottom: 1.25rem;
+    }
+
+    pre, code {
+      font-family: "SF Mono", "Segoe UI Mono", "Roboto Mono", Menlo, Courier, monospace;
+      border-radius: 0.25rem;
+    }
+
+    code {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 0.2rem 0.4rem;
+      font-size: 0.875rem;
+    }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 0.25rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .tag-blue {
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+    }
+
+    .tag-green {
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+    }
+
+    .tag-orange {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+    }
+
+    .info-box {
+      padding: 1rem;
+      border-radius: 0.25rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid;
+    }
+
+    .info-box.note {
+      background: rgba(59, 130, 246, 0.1);
+      border-left-color: var(--primary);
+    }
+
+    .info-box.tip {
+      background: rgba(34, 197, 94, 0.1);
+      border-left-color: var(--success);
+    }
+
+    .info-box.warning {
+      background: rgba(245, 158, 11, 0.1);
+      border-left-color: var(--warning);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+    }
+
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-weight: 600;
+      background: var(--code-bg);
+    }
+
+    ul, ol {
+      margin: 0 0 1.5rem 1.5rem;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    .codeblock-title {
+      background: #e5e7eb;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      border-top-left-radius: 0.25rem;
+      border-top-right-radius: 0.25rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .codeblock-title + pre {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      margin-top: 0;
+    }
+
+    .section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 2rem;
+    }
+
+    .method {
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+
+    .method-header {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .method-signature {
+      font-family: "SF Mono", "Segoe UI Mono", "Roboto Mono", Menlo, Courier, monospace;
+      font-size: 0.875rem;
+    }
+
+    .method-body {
+      padding: 1rem;
+    }
+
+    .parameter-table {
+      width: 100%;
+      font-size: 0.875rem;
+    }
+
+    .returns {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .example {
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="logo">
+        <span>📝</span> API Reference
+      </div>
+      
+      <div class="nav-group">
+        <h3 class="nav-title">Core Modules</h3>
+        <ul class="nav-items">
+          <li class="nav-item">
+            <a href="#project-manager" class="nav-link">ProjectManager</a>
+          </li>
+          <li class="nav-item">
+            <a href="#document-generator" class="nav-link">DocumentGenerator</a>
+          </li>
+          <li class="nav-item">
+            <a href="#context-manager" class="nav-link">ContextManager</a>
+          </li>
+          <li class="nav-item">
+            <a href="#version-history" class="nav-link">VersionHistory</a>
+          </li>
+          <li class="nav-item">
+            <a href="#auth-service" class="nav-link">AuthService</a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="nav-group">
+        <h3 class="nav-title">Components</h3>
+        <ul class="nav-items">
+          <li class="nav-item">
+            <a href="../user-guide/components.html#chat-interface" class="nav-link">ChatInterface</a>
+          </li>
+          <li class="nav-item">
+            <a href="../user-guide/components.html#file-manager" class="nav-link">FileManager</a>
+          </li>
+          <li class="nav-item">
+            <a href="../user-guide/components.html#generators" class="nav-link">Generators</a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="nav-group">
+        <h3 class="nav-title">Documentation</h3>
+        <ul class="nav-items">
+          <li class="nav-item">
+            <a href="../index.html" class="nav-link">Home</a>
+          </li>
+          <li class="nav-item">
+            <a href="../user-guide/index.html" class="nav-link">User Guide</a>
+          </li>
+          <li class="nav-item">
+            <a href="../developer-guide/index.html" class="nav-link">Developer Guide</a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+    
+    <main class="main-content">
+      <section id="introduction" class="section">
+        <h1>Core Modules Reference</h1>
+        
+        <p>
+          This document provides detailed information about the core modules that power GrantCraft. These modules contain the business logic and functionality that drives the application.
+        </p>
+        
+        <div class="info-box note">
+          <strong>Note:</strong> This documentation is for developers who want to understand, modify, or extend the GrantCraft codebase.
+        </div>
+      </section>
+      
+      <section id="project-manager" class="section">
+        <h2>ProjectManager Module</h2>
+        
+        <p>
+          The ProjectManager module handles the creation, organization, and management of grant projects and their files. It provides functionality for creating project structures, managing files, and tracking changes.
+        </p>
+        
+        <div class="tags">
+          <span class="tag tag-blue">Core Module</span>
+          <span class="tag tag-green">Data Management</span>
+        </div>
+        
+        <h3>Classes</h3>
+        
+        <h4>Project</h4>
+        <p>
+          Represents a single grant project with its structure, files, and metadata.
+        </p>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              constructor(title, topic, templateId = 'standard', projectManager = null)
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Creates a new Project instance.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>title</td>
+                  <td>string</td>
+                  <td>The title of the project</td>
+                </tr>
+                <tr>
+                  <td>topic</td>
+                  <td>string</td>
+                  <td>The research topic of the project</td>
+                </tr>
+                <tr>
+                  <td>templateId</td>
+                  <td>string</td>
+                  <td>ID of the template to use (standard, nih, nsf)</td>
+                </tr>
+                <tr>
+                  <td>projectManager</td>
+                  <td>ProjectManager</td>
+                  <td>Reference to the parent ProjectManager instance</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>const project = new Project(
+  'Novel Cancer Treatment Research',
+  'Immunotherapy for Pancreatic Cancer',
+  'nih'
+);</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              createFile(folderName, fileName, content = '')
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Creates a new file in the specified folder.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>folderName</td>
+                  <td>string</td>
+                  <td>Name of the folder to create the file in</td>
+                </tr>
+                <tr>
+                  <td>fileName</td>
+                  <td>string</td>
+                  <td>Name of the file to create</td>
+                </tr>
+                <tr>
+                  <td>content</td>
+                  <td>string</td>
+                  <td>Initial content for the file</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>The newly created file object</p>
+            </div>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>const file = project.createFile(
+  'abstract',
+  'abstract.md',
+  '# Research Abstract\n\nThis is a sample abstract...'
+);</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              updateFile(fileId, newContent)
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Updates the content of a file and saves the previous version to history.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>fileId</td>
+                  <td>string</td>
+                  <td>ID of the file to update</td>
+                </tr>
+                <tr>
+                  <td>newContent</td>
+                  <td>string</td>
+                  <td>New content for the file</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>The updated file object</p>
+            </div>
+          </div>
+        </div>
+        
+        <h4>ProjectManager</h4>
+        <p>
+          Manages multiple Project instances, providing methods for creating, retrieving, and organizing projects.
+        </p>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              constructor()
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Creates a new ProjectManager instance.</p>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>const projectManager = new ProjectManager();</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              createProject(title, topic, templateId = 'standard')
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Creates a new project.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>title</td>
+                  <td>string</td>
+                  <td>The title of the project</td>
+                </tr>
+                <tr>
+                  <td>topic</td>
+                  <td>string</td>
+                  <td>The research topic of the project</td>
+                </tr>
+                <tr>
+                  <td>templateId</td>
+                  <td>string</td>
+                  <td>ID of the template to use (standard, nih, nsf)</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>The newly created Project instance</p>
+            </div>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>const project = projectManager.createProject(
+  'Novel Cancer Treatment Research',
+  'Immunotherapy for Pancreatic Cancer',
+  'nih'
+);</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              getProject(projectId)
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Retrieves a project by its ID.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>projectId</td>
+                  <td>string</td>
+                  <td>ID of the project to retrieve</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>The Project instance or null if not found</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="document-generator" class="section">
+        <h2>DocumentGenerator Module</h2>
+        
+        <p>
+          The DocumentGenerator module is responsible for generating content for different sections of a grant proposal. It uses templates and natural language processing to create well-structured document content.
+        </p>
+        
+        <div class="tags">
+          <span class="tag tag-blue">Core Module</span>
+          <span class="tag tag-green">Content Generation</span>
+        </div>
+        
+        <h3>Classes</h3>
+        
+        <h4>DocumentGenerator</h4>
+        <p>
+          Generates document content based on templates and conversation context.
+        </p>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              constructor()
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Creates a new DocumentGenerator instance.</p>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>const documentGenerator = new DocumentGenerator();</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              async generateSection(sectionType, contextData, projectInfo)
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Generates content for a specific document section.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>sectionType</td>
+                  <td>string</td>
+                  <td>Type of section to generate (abstract, introduction, methodology, etc.)</td>
+                </tr>
+                <tr>
+                  <td>contextData</td>
+                  <td>object</td>
+                  <td>Conversation context data</td>
+                </tr>
+                <tr>
+                  <td>projectInfo</td>
+                  <td>object</td>
+                  <td>Project information (title, topic, etc.)</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>An object containing the generated content and metadata</p>
+            </div>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>const abstract = await documentGenerator.generateSection(
+  'abstract',
+  contextData,
+  { title: 'Cancer Research Project', topic: 'Immunotherapy' }
+);</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              async generateSubsection(subsection, relevantContext, placeholderValues, sectionType)
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Generates content for a specific subsection of a document.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>subsection</td>
+                  <td>object</td>
+                  <td>Subsection template object</td>
+                </tr>
+                <tr>
+                  <td>relevantContext</td>
+                  <td>object</td>
+                  <td>Extracted relevant context</td>
+                </tr>
+                <tr>
+                  <td>placeholderValues</td>
+                  <td>object</td>
+                  <td>Values for template placeholders</td>
+                </tr>
+                <tr>
+                  <td>sectionType</td>
+                  <td>string</td>
+                  <td>Type of section (abstract, introduction, etc.)</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>Generated content string for the subsection</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="context-manager" class="section">
+        <h2>ContextManager Module</h2>
+        
+        <p>
+          The ContextManager module handles the management and processing of conversation context. It keeps track of conversation history and extracts relevant information for document generation.
+        </p>
+        
+        <div class="tags">
+          <span class="tag tag-blue">Core Module</span>
+          <span class="tag tag-green">Context Processing</span>
+        </div>
+        
+        <h3>Classes</h3>
+        
+        <h4>ConversationContext</h4>
+        <p>
+          Manages conversation history and context for the chat interface.
+        </p>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              constructor()
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Creates a new ConversationContext instance.</p>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>const context = new ConversationContext();</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              addMessage(message)
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Adds a new message to the conversation history.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>message</td>
+                  <td>object</td>
+                  <td>Message object with user or assistant content</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>context.addMessage({
+  role: 'user',
+  content: 'I want to research cancer immunotherapy.'
+});</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              extractResearchInfo()
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Extracts research-related information from the conversation history.</p>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>Object containing extracted research information</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="version-history" class="section">
+        <h2>VersionHistory Module</h2>
+        
+        <p>
+          The VersionHistory module handles tracking and managing different versions of document files. It allows users to view past versions and restore them if needed.
+        </p>
+        
+        <div class="tags">
+          <span class="tag tag-blue">Core Module</span>
+          <span class="tag tag-green">Version Control</span>
+        </div>
+        
+        <h3>Classes</h3>
+        
+        <h4>VersionHistory</h4>
+        <p>
+          Manages version history for individual files.
+        </p>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              constructor()
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Creates a new VersionHistory instance.</p>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>const versionHistory = new VersionHistory();</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              addVersion(fileId, content, metadata = {})
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Adds a new version for a file.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>fileId</td>
+                  <td>string</td>
+                  <td>ID of the file</td>
+                </tr>
+                <tr>
+                  <td>content</td>
+                  <td>string</td>
+                  <td>Content of the file version</td>
+                </tr>
+                <tr>
+                  <td>metadata</td>
+                  <td>object</td>
+                  <td>Additional metadata for the version</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>The newly created version object</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              getVersions(fileId)
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Gets all versions for a file.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>fileId</td>
+                  <td>string</td>
+                  <td>ID of the file</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>Array of version objects</p>
+            </div>
+          </div>
+        </div>
+        
+        <h4>VersionManager</h4>
+        <p>
+          Manages version history across all projects.
+        </p>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              constructor()
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Creates a new VersionManager instance.</p>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>const versionManager = new VersionManager();</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              createVersion(fileId, content, metadata = {})
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Creates a new version of a file.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>fileId</td>
+                  <td>string</td>
+                  <td>ID of the file</td>
+                </tr>
+                <tr>
+                  <td>content</td>
+                  <td>string</td>
+                  <td>Content of the file version</td>
+                </tr>
+                <tr>
+                  <td>metadata</td>
+                  <td>object</td>
+                  <td>Additional metadata for the version</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>The newly created version object</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="auth-service" class="section">
+        <h2>AuthService Module</h2>
+        
+        <p>
+          The AuthService module handles user authentication, authorization, and session management. It provides functions for user registration, login, and permission checking.
+        </p>
+        
+        <div class="tags">
+          <span class="tag tag-blue">Core Module</span>
+          <span class="tag tag-green">Authentication</span>
+        </div>
+        
+        <div class="info-box note">
+          <strong>Note:</strong> The current implementation uses mock data and local storage. In a production environment, this would connect to a real authentication API.
+        </div>
+        
+        <h3>Methods</h3>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              login(username, password)
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Authenticates a user with username/email and password.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>username</td>
+                  <td>string</td>
+                  <td>Username or email of the user</td>
+                </tr>
+                <tr>
+                  <td>password</td>
+                  <td>string</td>
+                  <td>User's password</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>Promise resolving to the authenticated user object</p>
+            </div>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>try {
+  const user = await authService.login('researcher@example.com', 'password123');
+  console.log('Logged in as:', user.firstName);
+} catch (error) {
+  console.error('Login failed:', error.message);
+}</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              register(userData)
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Registers a new user.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>userData</td>
+                  <td>object</td>
+                  <td>User registration data</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>Promise resolving to the newly created user object</p>
+            </div>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>try {
+  const user = await authService.register({
+    username: 'newresearcher',
+    email: 'new@example.com',
+    password: 'securepassword',
+    firstName: 'Jane',
+    lastName: 'Smith',
+    institution: 'Research University'
+  });
+  console.log('Registered and logged in as:', user.username);
+} catch (error) {
+  console.error('Registration failed:', error.message);
+}</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              logout()
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Logs out the current user.</p>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>Promise resolving when logout is complete</p>
+            </div>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>await authService.logout();
+console.log('User logged out');</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              isAuthenticated()
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Checks if a user is currently authenticated.</p>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>Boolean indicating authentication status</p>
+            </div>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>if (authService.isAuthenticated()) {
+  console.log('User is logged in');
+} else {
+  console.log('No authenticated user');
+}</code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="method">
+          <div class="method-header">
+            <div class="method-signature">
+              hasPermission(permission)
+            </div>
+          </div>
+          <div class="method-body">
+            <p>Checks if the current user has a specific permission.</p>
+            
+            <h4>Parameters</h4>
+            <table class="parameter-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>permission</td>
+                  <td>string</td>
+                  <td>Permission to check</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="returns">
+              <h4>Returns</h4>
+              <p>Boolean indicating if the user has the permission</p>
+            </div>
+            
+            <div class="example">
+              <div class="codeblock-title">Example</div>
+              <pre><code>if (authService.hasPermission('create_project')) {
+  console.log('User can create projects');
+} else {
+  console.log('User does not have permission to create projects');
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <hr>
+      
+      <footer>
+        <p>GrantCraft API Reference © 2025. All rights reserved.</p>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
