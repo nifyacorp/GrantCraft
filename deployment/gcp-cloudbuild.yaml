@@ -1,0 +1,12 @@
+steps:
+  # Frontend
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/agentgpt-frontend', './next']
+  
+  # Backend
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/agentgpt-platform', './platform']
+
+images: 
+  - 'gcr.io/$PROJECT_ID/agentgpt-frontend'
+  - 'gcr.io/$PROJECT_ID/agentgpt-platform'
