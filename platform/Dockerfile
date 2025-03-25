@@ -35,7 +35,7 @@ COPY . /app/src/
 RUN poetry install --only main --no-cache
 
 # Create wrapper script for Cloud Run
-RUN echo '#!/bin/sh\nexport REWORKD_PLATFORM_PORT=$(echo $PORT | tr -dc "0-9")\nexec /usr/local/bin/python -m reworkd_platform' > /app/wrapper.sh && \
+RUN echo '#!/bin/sh\nexport REWORKD_PLATFORM_PORT=$(echo $PORT | tr -dc "0-9")\nexport REWORKD_PLATFORM_HOST="0.0.0.0"\nexport REWORKD_PLATFORM_ENVIRONMENT="production"\nexec /usr/local/bin/python -m reworkd_platform' > /app/wrapper.sh && \
     chmod +x /app/wrapper.sh
 
 CMD ["/app/wrapper.sh"]

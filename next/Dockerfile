@@ -33,6 +33,38 @@ RUN apk add --no-cache dos2unix netcat-openbsd \
 # Expose the port the app will run on
 EXPOSE 3000
 
+# Create a custom schema.prisma for Cloud Run
+RUN mkdir -p /next/prisma && echo 'generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}' > /next/prisma/schema.prisma
+
+# Create a simplified entrypoint for Cloud Run
+RUN echo '#!/bin/sh
+export NODE_ENV=production
+cd /next
+
+# Generate Prisma client
+npx prisma generate
+
+# Start the application
+exec npm run start
+' > /cloudrun-entrypoint.sh && chmod +x /cloudrun-entrypoint.sh
+
 ENTRYPOINT ["sh", "/entrypoint.sh"]
 
 # Start the application

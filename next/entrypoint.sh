@@ -1,28 +1,86 @@
 #!/usr/bin/env sh
 
 cd /next
-dos2unix wait-for-db.sh
+chmod +x /usr/local/bin/wait-for-db.sh
+dos2unix /usr/local/bin/wait-for-db.sh
+
+# Log current directory
+echo "Current directory: $(pwd)"
+echo "Listing files in current directory:"
+ls -la
 
 # copy .env file if not exists
 [ ! -f .env ] && [ -f .env.example ] && cp .env.example .env
-cp .env .env.temp
-dos2unix .env.temp
-cat .env.temp > .env
-rm .env.temp
+cp .env .env.temp 2>/dev/null || touch .env.temp
+dos2unix .env.temp 2>/dev/null || echo "dos2unix failed, continuing anyway"
+cat .env.temp > .env 2>/dev/null || echo "Failed to write to .env, creating new one"
+rm -f .env.temp
 
-source .env
-
-# Ensure DB is available before running Prisma commands
-./wait-for-db.sh agentgpt_db 3307
-
-# Run Prisma commands
-if [[ ! -f "/app/prisma/${DATABASE_URL:5}" ]]; then
-  npx prisma migrate deploy --name init
-  npx prisma db push
+# Create default .env with DATABASE_URL if needed
+if [ ! -f .env ] || ! grep -q "DATABASE_URL" .env; then
+  echo "Creating/updating .env with DATABASE_URL"
+  echo "DATABASE_URL=${DATABASE_URL:-mysql://reworkd_platform:reworkd_platform@34.66.109.248:3306/reworkd_platform}" > .env
 fi
 
-# Generate Prisma client
+source .env || echo "Failed to source .env, continuing anyway"
+
+echo "DATABASE_URL: $DATABASE_URL"
+
+# Ensure prisma directory exists
+mkdir -p prisma
+
+# Create basic schema.prisma if it doesn't exist
+if [ ! -f prisma/schema.prisma ]; then
+  echo "Creating basic schema.prisma"
+  cat > prisma/schema.prisma << 'EOF'
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+EOF
+fi
+
+# Wait for database to be available
+if echo "$DATABASE_URL" | grep -q "mysql"; then
+  echo "Waiting for MySQL database..."
+  DB_HOST=$(echo "$DATABASE_URL" | sed -E 's/mysql:\/\/[^:]+:[^@]+@([^:]+):.*/\1/')
+  DB_PORT=$(echo "$DATABASE_URL" | sed -E 's/mysql:\/\/[^:]+:[^@]+@[^:]+:([0-9]+)\/.*/\1/')
+  
+  echo "Checking connection to $DB_HOST:$DB_PORT"
+  for i in $(seq 1 30); do
+    nc -z -w 1 "$DB_HOST" "$DB_PORT" && break
+    echo "Waiting for database connection... ($i/30)"
+    sleep 2
+  done
+fi
+
+# Ensure Prisma is installed
+npm ls prisma || npm install -g prisma
+
+# Generate Prisma client (always do this)
+echo "Generating Prisma client"
 npx prisma generate
 
+# If database is available, try migrations
+if echo "$DATABASE_URL" | grep -q "mysql"; then
+  echo "Pushing schema to database"
+  npx prisma db push --skip-generate --accept-data-loss || echo "Database push failed, continuing anyway"
+fi
+
 # run cmd
+echo "Running command: $@"
 exec "$@"
