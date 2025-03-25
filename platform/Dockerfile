@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
   pkg-config \
   openjdk-11-jdk \
   build-essential \
+  netcat-traditional \
   && rm -rf /var/lib/apt/lists/*
 
 RUN pip install poetry==1.4.2
@@ -30,7 +31,11 @@ RUN apt-get purge -y \
 COPY . /app/src/
 RUN poetry install --only main
 
-CMD ["/usr/local/bin/python", "-m", "reworkd_platform"]
+# Create wrapper script for Cloud Run
+RUN echo '#!/bin/sh\nexport REWORKD_PLATFORM_PORT=$(echo $PORT | tr -dc "0-9")\nexec /usr/local/bin/python -m reworkd_platform' > /app/wrapper.sh && \
+    chmod +x /app/wrapper.sh
+
+CMD ["/app/wrapper.sh"]
 
 FROM prod as dev
 
