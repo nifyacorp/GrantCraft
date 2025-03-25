@@ -18,8 +18,9 @@ RUN poetry config virtualenvs.create false
 COPY pyproject.toml /app/src/
 WORKDIR /app/src
 
-# Installing requirements with updated dependencies
+# Installing requirements with fixed dependencies
 RUN pip cache purge && \
+    poetry config installer.max-workers 10 && \
     poetry install --only main
 
 # Removing gcc
