@@ -18,8 +18,10 @@ RUN poetry config virtualenvs.create false
 COPY pyproject.toml /app/src/
 WORKDIR /app/src
 
-# Installing requirements
-RUN poetry install --only main
+# Installing requirements with updated dependencies
+RUN pip cache purge && \
+    poetry install --only main
+
 # Removing gcc
 RUN apt-get purge -y \
   g++ \
@@ -29,7 +31,7 @@ RUN apt-get purge -y \
 
 # Copying actual application
 COPY . /app/src/
-RUN poetry install --only main
+RUN poetry install --only main --no-cache
 
 # Create wrapper script for Cloud Run
 RUN echo '#!/bin/sh\nexport REWORKD_PLATFORM_PORT=$(echo $PORT | tr -dc "0-9")\nexec /usr/local/bin/python -m reworkd_platform' > /app/wrapper.sh && \
