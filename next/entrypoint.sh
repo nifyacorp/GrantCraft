@@ -86,6 +86,12 @@ if [ -z "$NODE_ENV" ]; then
   export NODE_ENV=production
 fi
 
+# Check if .next/BUILD_ID exists, if not, run build
+if [ ! -f ".next/BUILD_ID" ]; then
+  echo "BUILD_ID not found. Running build process..."
+  npm run build
+fi
+
 # For Cloud Run, always run in production mode instead of development
 if [ "$1" = "npm" ] && [ "$2" = "run" ] && [ "$3" = "dev" ]; then
   echo "Forcing 'npm run start' instead of 'npm run dev' for Cloud Run"

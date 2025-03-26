@@ -1,7 +1,7 @@
 # Use the official Node.js image as the base image
-FROM node:19-alpine
+FROM node:18-alpine
 
-ARG NODE_ENV
+ARG NODE_ENV=production
 
 ENV NODE_ENV=$NODE_ENV
 
@@ -29,14 +29,13 @@ COPY entrypoint.sh /
 RUN apk add --no-cache dos2unix netcat-openbsd \
     && dos2unix /entrypoint.sh
 
+# Build the application during image creation if NODE_ENV is production
+RUN if [ "$NODE_ENV" = "production" ]; then npm run build; fi
 
 # Expose the port the app will run on
 EXPOSE 3000
 
-# Remove these custom entries since we've updated the entrypoint.sh
-# The improved entrypoint.sh will handle schema creation and all the necessary steps
-
 ENTRYPOINT ["sh", "/entrypoint.sh"]
 
 # Start the application
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
