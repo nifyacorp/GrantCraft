@@ -81,6 +81,17 @@ if echo "$DATABASE_URL" | grep -q "mysql"; then
   npx prisma db push --skip-generate --accept-data-loss || echo "Database push failed, continuing anyway"
 fi
 
-# run cmd
-echo "Running command: $@"
-exec "$@"
+# Force production mode for Cloud Run
+if [ -z "$NODE_ENV" ]; then
+  export NODE_ENV=production
+fi
+
+# For Cloud Run, always run in production mode instead of development
+if [ "$1" = "npm" ] && [ "$2" = "run" ] && [ "$3" = "dev" ]; then
+  echo "Forcing 'npm run start' instead of 'npm run dev' for Cloud Run"
+  exec npm run start
+else
+  # run original command
+  echo "Running command: $@"
+  exec "$@"
+fi

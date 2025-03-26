@@ -27,14 +27,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
     document.documentElement.lang = i18n.language;
   }, [i18n]);
 
-  // Disable Google Analytics in development or when NEXT_PUBLIC_GA_ID is not set
-  const shouldEnableGA = process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_GA_ID;
-
+  // Disable analytics components since they're causing render errors in this environment
   return (
     <div>
       <SessionProvider session={session}>
-        {shouldEnableGA && <GoogleAnalytics trackPageViews />}
-        <Analytics />
         <Component {...pageProps} />
       </SessionProvider>
     </div>
