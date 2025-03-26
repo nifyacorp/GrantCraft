@@ -35,16 +35,7 @@ RUN dos2unix /entrypoint.sh
 # Create prisma directory and basic schema if it doesn't exist
 RUN mkdir -p prisma && \
     if [ ! -f prisma/schema.prisma ]; then \
-      cat > prisma/schema.prisma << 'EOF'
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-EOF
+      printf "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n" > prisma/schema.prisma; \
     fi
 
 # Build the application during image creation if NODE_ENV is production
