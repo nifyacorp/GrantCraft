@@ -18,8 +18,8 @@ COPY package*.json ./
 RUN grep -v '"prepare":' package.json > package.json.tmp && \
     mv package.json.tmp package.json
 
-# Install dependencies
-RUN npm ci
+# Install dependencies including TypeScript
+RUN npm ci && npm install --save-dev typescript
 
 # Copy the wait-for-db.sh script
 COPY wait-for-db.sh /usr/local/bin/wait-for-db.sh
@@ -38,8 +38,11 @@ RUN mkdir -p prisma && \
       printf "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id            String   @id @default(cuid())\n  name          String?\n  email         String?  @unique\n  emailVerified DateTime?\n  image         String?\n  createdAt     DateTime @default(now())\n  updatedAt     DateTime @updatedAt\n}\n" > prisma/schema.prisma; \
     fi
 
-# Skip build in Dockerfile - will be done in entrypoint
-ENV SKIP_BUILD=true
+# Build the application during image creation
+RUN mkdir -p .next && \
+    # Pre-install TypeScript to avoid download during build
+    npm install --no-save typescript && \
+    npm run build
 
 # Expose the port the app will run on
 EXPOSE 3000
