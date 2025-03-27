@@ -1,28 +1,28 @@
-2025-03-27 12:41:41.555 CET
+2025-03-27 14:26:24.899 CET
+15 vulnerabilities (2 low, 8 moderate, 4 high, 1 critical)
+2025-03-27 14:26:24.899 CET
+To address issues that do not require attention, run:
+2025-03-27 14:26:24.899 CET
+npm audit fix
+2025-03-27 14:26:24.899 CET
+To address all issues (including breaking changes), run:
+2025-03-27 14:26:24.899 CET
+npm audit fix --force
+2025-03-27 14:26:24.899 CET
+Run `npm audit` for details.
+2025-03-27 14:26:41.114 CET
+Failed to compile.
+2025-03-27 14:26:41.115 CET
+./src/hooks/useAgent.ts:1:15
+2025-03-27 14:26:41.115 CET
+Type error: Module '"@prisma/client"' has no exported member 'Agent'.
+2025-03-27 14:26:41.115 CET
+[0m[31m[1m>[22m[39m[90m 1 | [39m[36mimport[39m type { [33mAgent[39m [36mas[39m [33mPrismaAgent[39m } [36mfrom[39m [32m"@prisma/client"[39m[33m;[39m[0m
+2025-03-27 14:26:41.115 CET
 [0m [90m | [39m [31m[1m^[22m[39m[0m
-2025-03-27 12:41:41.555 CET
+2025-03-27 14:26:41.115 CET
 [0m [90m 2 | [39m[0m
-2025-03-27 12:41:41.555 CET
+2025-03-27 14:26:41.115 CET
 [0m [90m 3 | [39m[36mimport[39m { useAuth } [36mfrom[39m [32m"./useAuth"[39m[33m;[39m[0m
-2025-03-27 12:41:41.555 CET
+2025-03-27 14:26:41.115 CET
 [0m [90m 4 | [39m[36mimport[39m type { [33mCreateAgentProps[39m[33m,[39m [33mSaveAgentProps[39m } [36mfrom[39m [32m"../server/api/routers/agentRouter"[39m[33m;[39m[0m
-2025-03-27 12:41:41.658 CET
-Running command: npm run start
-2025-03-27 12:41:42.094 CET
-> agent-gpt@1.0.0 start
-2025-03-27 12:41:42.094 CET
-> next start
-2025-03-27 12:41:42.829 CET
-Default STARTUP TCP probe succeeded after 1 attempt for container "placeholder-1" on port 8080.
-2025-03-27 12:41:43.155 CET
-[Error: ENOENT: no such file or directory, scandir '/next/.next/static'] {
-2025-03-27 12:41:43.155 CET
-errno: -2,
-2025-03-27 12:41:43.155 CET
-code: 'ENOENT',
-2025-03-27 12:41:43.155 CET
-syscall: 'scandir',
-2025-03-27 12:41:43.155 CET
-path: '/next/.next/static'
-2025-03-27 12:41:43.155 CET
-}
