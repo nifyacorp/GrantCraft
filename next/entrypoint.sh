@@ -61,13 +61,59 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  name          String?
-  email         String?  @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String             @id @default(cuid())
+  name            String?
+  email           String?            @unique
+  emailVerified   DateTime?
+  image           String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  agents          Agent[]
+  superAdmin      Boolean            @default(false)
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+}
+
+model Agent {
+  id          String       @id @default(cuid())
+  name        String
+  goal        String
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+  createDate  DateTime     @default(now())
+  deleteDate  DateTime?
+  tasks       AgentTask[]
+}
+
+model AgentTask {
+  id        String   @id @default(cuid())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id])
+  type      String
+  status    String?
+  info      String   @db.Text
+  value     String   @db.Text
+  sort      Int
+  createDate DateTime @default(now())
+}
+
+model Organization {
+  id            String            @id @default(cuid())
+  name          String
+  users         OrganizationUser[]
+}
+
+model OrganizationUser {
+  id              String       @id @default(cuid())
+  user_id         String
+  organization_id String
+  organization    Organization @relation(fields: [organization_id], references: [id])
+  role            String
 }
 EOF
 fi

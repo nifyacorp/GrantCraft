@@ -35,7 +35,8 @@ RUN dos2unix /entrypoint.sh
 # Create prisma directory and basic schema if it doesn't exist
 RUN mkdir -p prisma && \
     if [ ! -f prisma/schema.prisma ]; then \
-      printf "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id            String   @id @default(cuid())\n  name          String?\n  email         String?  @unique\n  emailVerified DateTime?\n  image         String?\n  createdAt     DateTime @default(now())\n  updatedAt     DateTime @updatedAt\n}\n" > prisma/schema.prisma; \
+      echo "Creating minimal schema.prisma during build" && \
+      printf "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n" > prisma/schema.prisma; \
     fi
 
 # Create .next directory with a placeholder BUILD_ID
@@ -50,8 +51,8 @@ RUN mkdir -p .next && \
 ENV SKIP_ENV_VALIDATION=true
 ENV NODE_ENV=production
 
-# Copy .env.production if it exists (for Cloud Build integration)
-COPY .env.production* ./.env.production* 2>/dev/null || :
+# Copy .env as .env.production if .env exists (for Cloud Build integration)
+COPY .env ./.env.production 2>/dev/null || echo "No .env file to copy"
 
 # Disabling build at image creation time - it will happen in entrypoint with runtime env vars
 # RUN npm run build
