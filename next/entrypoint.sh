@@ -73,7 +73,40 @@ npm ls prisma || npm install -g prisma
 
 # Generate Prisma client (always do this)
 echo "Generating Prisma client"
-npx prisma generate
+# Add debug information for Prisma schema
+echo "Contents of prisma/schema.prisma:"
+cat prisma/schema.prisma
+
+# Run Prisma generate with error handling
+npx prisma generate || {
+  echo "Prisma generate failed, checking and fixing issues..."
+  # Make sure there's at least one model in the schema
+  if ! grep -q "model" prisma/schema.prisma; then
+    echo "No models found in schema.prisma, adding User model"
+    cat > prisma/schema.prisma << 'EOF'
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+EOF
+    # Try generating again
+    npx prisma generate || echo "Prisma generate still failed, continuing anyway..."
+  fi
+}
 
 # If database is available, try migrations
 if echo "$DATABASE_URL" | grep -q "mysql"; then

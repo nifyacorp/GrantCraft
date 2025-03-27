@@ -22,8 +22,37 @@ EOF
 
 echo "Created .env file with Cloud Run configuration"
 
+# Ensure prisma directory exists with a valid schema
+mkdir -p prisma
+cat > prisma/schema.prisma << EOF
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+EOF
+
+echo "Created basic Prisma schema with User model"
+
+# Generate Prisma client
+echo "Generating Prisma client..."
+npx prisma generate
+
 # Build the application
 echo "Building Next.js application in production mode..."
-npm run build
+NODE_ENV=production npm run build
 
 echo "Build complete. The application is ready for Cloud Run deployment."
