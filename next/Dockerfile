@@ -51,9 +51,6 @@ RUN mkdir -p .next && \
 ENV SKIP_ENV_VALIDATION=true
 ENV NODE_ENV=production
 
-# Copy .env as .env.production if .env exists (for Cloud Build integration)
-COPY .env ./.env.production 2>/dev/null || echo "No .env file to copy"
-
 # Disabling build at image creation time - it will happen in entrypoint with runtime env vars
 # RUN npm run build
 
