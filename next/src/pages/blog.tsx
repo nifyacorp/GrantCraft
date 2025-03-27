@@ -1,5 +1,5 @@
-import React from "react";
 import { useRouter } from "next/router";
+import React from "react";
 
 import AppHead from "../components/AppHead";
 import FooterLinks from "../components/landing/FooterLinks";

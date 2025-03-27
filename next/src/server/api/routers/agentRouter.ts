@@ -24,7 +24,7 @@ async function generateAgentName(goal: string) {
 
   try {
     const openAI = new OpenAI({
-      apiKey: env.OPENAI_API_KEY as string,
+      apiKey: env.OPENAI_API_KEY ,
     });
 
     const chatCompletion = await openAI.chat.completions.create({
