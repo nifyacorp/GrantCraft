@@ -61,7 +61,7 @@ export const agentRouter = createTRPCRouter({
       data: {
         name: name.trim(),
         goal: input.goal,
-        userId: ctx.session?.user?.id,
+        userId: ctx.session?.user?.id || "",
       },
     });
   }),
@@ -80,8 +80,8 @@ export const agentRouter = createTRPCRouter({
         data: {
           agentId: agent.id,
           type: e.type,
-          ...(e.type === MESSAGE_TYPE_TASK && { status: e.status }),
-          info: e.info,
+          status: e.type === MESSAGE_TYPE_TASK ? e.status || "" : null,
+          info: e.info || "",
           value: e.value,
           sort: 0, // TODO: Remove sort
         },
