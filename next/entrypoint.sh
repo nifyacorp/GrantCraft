@@ -118,9 +118,9 @@ model OrganizationUser {
 EOF
 fi
 
-# Generate Prisma client
-echo "Generating Prisma client"
-npx prisma generate
+# Generate Prisma client using our robust script
+echo "Generating Prisma client with ensure-schema.js"
+node prisma/ensure-schema.js
 
 # Create .next directory if it doesn't exist
 echo "Ensuring .next directory exists"

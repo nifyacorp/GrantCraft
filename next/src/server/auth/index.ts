@@ -48,8 +48,8 @@ const commonOptions: Partial<AuthOptions> & { adapter: Adapter } = {
       session.user.id = user.id;
       session.user.superAdmin = user.superAdmin;
       session.user.organizations = orgs.map((row) => ({
-        id: row.organization.id,
-        name: row.organization.name,
+        id: row.organization?.id || row.organization_id,
+        name: row.organization?.name || "Unknown Organization",
         role: row.role,
       }));
 

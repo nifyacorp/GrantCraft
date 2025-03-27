@@ -36,8 +36,11 @@ RUN dos2unix /entrypoint.sh
 RUN mkdir -p prisma && \
     if [ ! -f prisma/schema.prisma ]; then \
       echo "Creating minimal schema.prisma during build" && \
-      printf "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n" > prisma/schema.prisma; \
+      printf "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id              String             @id @default(cuid())\n  name            String?\n  email           String?            @unique\n  emailVerified   DateTime?\n  image           String?\n  createdAt       DateTime           @default(now())\n  updatedAt       DateTime           @updatedAt\n  agents          Agent[]\n  superAdmin      Boolean            @default(false)\n}\n\nmodel Agent {\n  id          String       @id @default(cuid())\n  name        String\n  goal        String\n  userId      String\n  createDate  DateTime     @default(now())\n  deleteDate  DateTime?\n  tasks       AgentTask[]\n}\n\nmodel AgentTask {\n  id        String   @id @default(cuid())\n  agentId   String\n  agent     Agent    @relation(fields: [agentId], references: [id])\n  type      String\n  status    String?\n  info      String   @db.Text\n  value     String   @db.Text\n  sort      Int\n  createDate DateTime @default(now())\n}\n" > prisma/schema.prisma; \
     fi
+    
+# Generate Prisma client in build stage
+RUN npx prisma generate
 
 # Create .next directory with a placeholder BUILD_ID
 RUN mkdir -p .next && \

@@ -1,4 +1,6 @@
+// Import type with a fallback in case Prisma client generation fails
 import type { Agent } from "@prisma/client";
+// The fallback is defined in src/types/prisma-fallback.d.ts
 import { useAuth } from "./useAuth";
 import type { CreateAgentProps, SaveAgentProps } from "../server/api/routers/agentRouter";
 import { api } from "../utils/api";
