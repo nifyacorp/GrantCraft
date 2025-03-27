@@ -1,0 +1,26 @@
+steps:
+  # Create .env.production with SKIP_ENV_VALIDATION=true
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'setup-env'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Creating .env.production file for build"
+        mkdir -p .next
+        cat > .env.production << EOF
+        SKIP_ENV_VALIDATION=true
+        NODE_ENV=production
+        EOF
+        echo "Created .env.production with SKIP_ENV_VALIDATION=true"
+
+  # Install dependencies and build
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '$_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_SERVICE_NAME', '.']
+
+# Push the container image to Container Registry
+images:
+  - '$_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_SERVICE_NAME'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

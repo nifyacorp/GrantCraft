@@ -76,12 +76,12 @@ fi
 echo "Generating Prisma client"
 npx prisma generate
 
-# Only rebuild if BUILD_ID doesn't exist or if FORCE_REBUILD=true
-if [ ! -f ".next/BUILD_ID" ] || [ "$FORCE_REBUILD" = "true" ]; then
-  echo "Building application in production mode"
+# Only rebuild if BUILD_ID doesn't exist, FORCE_REBUILD=true, or running in development
+if [ ! -f ".next/BUILD_ID" ] || [ "$FORCE_REBUILD" = "true" ] || [ "$NODE_ENV" = "development" ]; then
+  echo "Building application"
   # Make sure typescript is already installed to avoid downloading during build
   npm list typescript || npm install --no-save typescript
-  NODE_ENV=production npm run build
+  npm run build
 else
   echo "Using existing build (found .next/BUILD_ID)"
 fi

@@ -38,14 +38,20 @@ RUN mkdir -p prisma && \
       printf "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id            String   @id @default(cuid())\n  name          String?\n  email         String?  @unique\n  emailVerified DateTime?\n  image         String?\n  createdAt     DateTime @default(now())\n  updatedAt     DateTime @updatedAt\n}\n" > prisma/schema.prisma; \
     fi
 
-# Create .next directory but don't build during image creation
-# (build will happen in entrypoint.sh with correct environment variables)
+# Create .next directory
 RUN mkdir -p .next && \
     # Pre-install TypeScript to avoid download during build
     npm install --no-save typescript
 
 # Set environment variables for build validation
 ENV SKIP_ENV_VALIDATION=true
+ENV NODE_ENV=production
+
+# Copy .env.production if it exists (for Cloud Build integration)
+COPY .env.production* ./.env.production* 2>/dev/null || :
+
+# Build the application (this will use SKIP_ENV_VALIDATION=true)
+RUN npm run build
 
 # Expose the port the app will run on
 EXPOSE 3000

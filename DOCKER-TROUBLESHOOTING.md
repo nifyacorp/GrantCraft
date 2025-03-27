@@ -55,6 +55,15 @@ For proper environment variable handling, we:
 3. Ensure the entrypoint.sh script properly sets up environment variables
 4. The entrypoint script exports the environment variables to ensure they're available
 
+### Cloud Run Deployment
+
+For Cloud Run deployments:
+
+1. Environment variables should be set in the Cloud Run service configuration, not in the source code
+2. This is done through the `--set-env-vars` flags in the `gcloud run deploy` command
+3. For sensitive values, use Secret Manager and the `--update-secrets` flag
+4. The `SKIP_ENV_VALIDATION=true` environment variable is essential for the build process
+
 ## Running the Container
 
 ```bash
