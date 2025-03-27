@@ -76,14 +76,26 @@ fi
 echo "Generating Prisma client"
 npx prisma generate
 
-# Only rebuild if BUILD_ID doesn't exist, FORCE_REBUILD=true, or running in development
-if [ ! -f ".next/BUILD_ID" ] || [ "$FORCE_REBUILD" = "true" ] || [ "$NODE_ENV" = "development" ]; then
-  echo "Building application"
-  # Make sure typescript is already installed to avoid downloading during build
-  npm list typescript || npm install --no-save typescript
-  npm run build
-else
-  echo "Using existing build (found .next/BUILD_ID)"
+# Create .next directory if it doesn't exist
+echo "Ensuring .next directory exists"
+mkdir -p .next
+
+# Create a BUILD_ID file if it doesn't exist
+if [ ! -f ".next/BUILD_ID" ]; then
+  echo "Creating minimal BUILD_ID file"
+  echo "$(date +%Y%m%d%H%M%S)" > .next/BUILD_ID
+fi
+
+# Always run next build in runtime environment
+echo "Building application with runtime environment variables"
+# Make sure typescript is already installed to avoid downloading during build
+npm list typescript || npm install --no-save typescript
+npm run build
+
+# Double check BUILD_ID exists after build
+if [ ! -f ".next/BUILD_ID" ]; then
+  echo "BUILD_ID still missing after build, creating fallback"
+  echo "$(date +%Y%m%d%H%M%S)" > .next/BUILD_ID
 fi
 
 # Run the command

@@ -9,8 +9,11 @@
 ```
 
 **Solution:**
-- Added `mkdir -p .next` in entrypoint.sh
-- Ensured application builds correctly with proper environment variables
+- Added `mkdir -p .next` in entrypoint.sh and Dockerfile
+- Created a placeholder BUILD_ID file in the Dockerfile: `echo "$(date +%Y%m%d%H%M%S)" > .next/BUILD_ID`
+- Added fallback creation of BUILD_ID in entrypoint.sh if it doesn't exist
+- Made .next directory writable: `chmod -R 777 .next`
+- Always run the build in entrypoint.sh with runtime environment variables
 
 ### Issue 2: TypeScript missing during build
 **Error:**
