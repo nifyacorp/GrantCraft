@@ -6,13 +6,13 @@ import React, { useEffect, useState } from "react";
 import FadeIn from "../components/motions/FadeIn";
 import PrimaryButton from "../components/PrimaryButton";
 
-const welcome = () => {
+const Welcome = () => {
   const router = useRouter();
   const controls = useAnimation();
   const [buttonClicked, setButtonClicked] = useState(false);
 
   useEffect(() => {
-    controls.start({
+    void controls.start({
       scale: 1,
       y: 0,
       transition: { type: "spring", stiffness: 80, damping: 15, mass: 1 },
@@ -21,7 +21,7 @@ const welcome = () => {
 
   useEffect(() => {
     if (buttonClicked) {
-      controls.start({
+      void controls.start({
         opacity: 0,
         transition: { duration: 0.75 },
       });
@@ -72,4 +72,4 @@ const welcome = () => {
   );
 };
 
-export default welcome;
+export default Welcome;

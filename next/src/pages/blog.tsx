@@ -8,7 +8,22 @@ import NavBar from "../components/NavBar";
 import { getSortedPostsData } from "../lib/posts";
 
 
-export default function BlogPage({ allPostsData }) { 
+interface PostData {
+  id: string;
+  title: string;
+  date: string;
+  imageUrl: string;
+  category: {
+    title: string;
+  };
+  author: {
+    name: string;
+    imageUrl: string;
+    role: string;
+  };
+}
+
+export default function BlogPage({ allPostsData }: { allPostsData: PostData[] }) { 
   const router = useRouter();
 
   return (
@@ -99,7 +114,7 @@ export default function BlogPage({ allPostsData }) {
   );
 }
 
-export async function getStaticProps() {
+export function getStaticProps() {
   const allPostsData = getSortedPostsData();
   return {
     props: {

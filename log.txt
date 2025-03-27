@@ -1,79 +1,28 @@
-DEFAULT 2025-03-27T10:00:31.023956Z SHLVL=1
-DEFAULT 2025-03-27T10:00:31.023963Z SKIP_ENV_VALIDATION=true
-DEFAULT 2025-03-27T10:00:31.023969Z YARN_VERSION=1.22.22
-DEFAULT 2025-03-27T10:00:31.024192Z Environment variables:
-DEFAULT 2025-03-27T10:00:31.024202Z DATABASE_URL: mysql://reworkd_platform:Platform_DB_Pass_2025!@34.66.109.248:3306/reworkd_platform
-DEFAULT 2025-03-27T10:00:31.024230Z NEXTAUTH_SECRET: grantcraft_next_auth_secret_2025!
-DEFAULT 2025-03-27T10:00:31.024238Z NEXTAUTH_URL: https://grantcraft-frontend-320165158819.us-central1.run.app
-DEFAULT 2025-03-27T10:00:31.024266Z NEXT_PUBLIC_BACKEND_URL: https://grantcraft-backend-320165158819.us-central1.run.app
-DEFAULT 2025-03-27T10:00:31.027467Z Generating Prisma client
-DEFAULT 2025-03-27T10:00:33.806130Z Environment variables loaded from .env
-DEFAULT 2025-03-27T10:00:33.814058Z Prisma schema loaded from prisma/schema.prisma
-DEFAULT 2025-03-27T10:00:34.870635Z ✔ Generated Prisma Client (4.13.0 | library) to ./node_modules/@prisma/client in 131ms
-DEFAULT 2025-03-27T10:00:34.870651Z You can now start using Prisma Client in your code. Reference: https://pris.ly/d/client
-DEFAULT 2025-03-27T10:00:34.870658Z ```
-DEFAULT 2025-03-27T10:00:34.870664Z import { PrismaClient } from '@prisma/client'
-DEFAULT 2025-03-27T10:00:34.870670Z const prisma = new PrismaClient()
-DEFAULT 2025-03-27T10:00:34.870676Z ```
-DEFAULT 2025-03-27T10:00:34.926713Z ┌─────────────────────────────────────────────────────────┐
-DEFAULT 2025-03-27T10:00:34.926733Z │ Update available 4.13.0 -> 6.5.0 │
-DEFAULT 2025-03-27T10:00:34.926739Z │ │
-DEFAULT 2025-03-27T10:00:34.926745Z │ This is a major update - please follow the guide at │
-DEFAULT 2025-03-27T10:00:34.926751Z │ https://pris.ly/d/major-version-upgrade │
-DEFAULT 2025-03-27T10:00:34.926757Z │ │
-DEFAULT 2025-03-27T10:00:34.926762Z │ Run the following to update │
-DEFAULT 2025-03-27T10:00:34.926768Z │ npm i --save-dev prisma@latest │
-DEFAULT 2025-03-27T10:00:34.926774Z │ npm i @prisma/client@latest │
-DEFAULT 2025-03-27T10:00:34.926781Z └─────────────────────────────────────────────────────────┘
-DEFAULT 2025-03-27T10:00:34.985413Z Building application in production mode
-DEFAULT 2025-03-27T10:00:36.749027Z agent-gpt@1.0.0 /next
-DEFAULT 2025-03-27T10:00:36.749048Z `-- (empty)
-DEFAULT 2025-03-27T10:00:43.054847Z up to date, audited 428 packages in 6s
-DEFAULT 2025-03-27T10:00:43.054864Z 123 packages are looking for funding
-DEFAULT 2025-03-27T10:00:43.054870Z run `npm fund` for details
-DEFAULT 2025-03-27T10:00:43.178961Z 11 vulnerabilities (2 low, 6 moderate, 2 high, 1 critical)
-DEFAULT 2025-03-27T10:00:43.178984Z To address issues that do not require attention, run:
-DEFAULT 2025-03-27T10:00:43.178991Z npm audit fix
-DEFAULT 2025-03-27T10:00:43.178999Z To address all issues (including breaking changes), run:
-DEFAULT 2025-03-27T10:00:43.179005Z npm audit fix --force
-DEFAULT 2025-03-27T10:00:43.179013Z Run `npm audit` for details.
-DEFAULT 2025-03-27T10:00:43.604998Z > agent-gpt@1.0.0 build
-DEFAULT 2025-03-27T10:00:43.605013Z > next build --no-lint
-DEFAULT 2025-03-27T10:00:44.921133Z ⚠ Linting is disabled
-DEFAULT 2025-03-27T10:00:45.222524Z Attention: Next.js now collects completely anonymous telemetry regarding usage.
-DEFAULT 2025-03-27T10:00:45.222547Z This information is used to shape Next.js' roadmap and prioritize features.
-DEFAULT 2025-03-27T10:00:45.222556Z You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-DEFAULT 2025-03-27T10:00:45.222563Z https://nextjs.org/telemetry
-DEFAULT 2025-03-27T10:00:45.403768Z Checking validity of types ...
-DEFAULT 2025-03-27T10:00:45.637250Z It looks like you're trying to use TypeScript but do not have the required package(s) installed.
-DEFAULT 2025-03-27T10:00:45.637268Z Installing dependencies
-DEFAULT 2025-03-27T10:00:45.637281Z If you are not trying to use TypeScript, please remove the tsconfig.json file from your package root (and any TypeScript files in your pages directory).
-DEFAULT 2025-03-27T10:00:45.671309Z Installing devDependencies (npm):
-DEFAULT 2025-03-27T10:00:45.671738Z - typescript
-DEFAULT 2025-03-27T10:01:00.931705Z added 740 packages, and audited 1168 packages in 15s
-DEFAULT 2025-03-27T10:01:00.932181Z 286 packages are looking for funding
-DEFAULT 2025-03-27T10:01:00.932193Z run `npm fund` for details
-DEFAULT 2025-03-27T10:01:01.045829Z 15 vulnerabilities (2 low, 8 moderate, 4 high, 1 critical)
-DEFAULT 2025-03-27T10:01:01.045848Z To address issues that do not require attention, run:
-DEFAULT 2025-03-27T10:01:01.045856Z npm audit fix
-DEFAULT 2025-03-27T10:01:01.045862Z To address all issues (including breaking changes), run:
-DEFAULT 2025-03-27T10:01:01.045868Z npm audit fix --force
-DEFAULT 2025-03-27T10:01:01.045874Z Run `npm audit` for details.
-DEFAULT 2025-03-27T10:01:14.268002Z Failed to compile.
-DEFAULT 2025-03-27T10:01:14.268805Z ./src/hooks/useAgent.ts:1:15
-DEFAULT 2025-03-27T10:01:14.268819Z Type error: Module '"@prisma/client"' has no exported member 'Agent'.
-DEFAULT 2025-03-27T10:01:14.268831Z [0m[31m[1m>[22m[39m[90m 1 | [39m[36mimport[39m type { [33mAgent[39m [36mas[39m [33mPrismaAgent[39m } [36mfrom[39m [32m"@prisma/client"[39m[33m;[39m[0m
-DEFAULT 2025-03-27T10:01:14.268837Z [0m [90m | [39m [31m[1m^[22m[39m[0m
-DEFAULT 2025-03-27T10:01:14.268844Z [0m [90m 2 | [39m[0m
-DEFAULT 2025-03-27T10:01:14.268851Z [0m [90m 3 | [39m[36mimport[39m { useAuth } [36mfrom[39m [32m"./useAuth"[39m[33m;[39m[0m
-DEFAULT 2025-03-27T10:01:14.268856Z [0m [90m 4 | [39m[36mimport[39m type { [33mCreateAgentProps[39m[33m,[39m [33mSaveAgentProps[39m } [36mfrom[39m [32m"../server/api/routers/agentRouter"[39m[33m;[39m[0m
-DEFAULT 2025-03-27T10:01:14.372875Z Running command: npm run start
-DEFAULT 2025-03-27T10:01:14.793771Z > agent-gpt@1.0.0 start
-DEFAULT 2025-03-27T10:01:14.793788Z > next start
-INFO 2025-03-27T10:01:15.488967Z Default STARTUP TCP probe succeeded after 1 attempt for container "placeholder-1" on port 8080.
-DEFAULT 2025-03-27T10:01:15.784303Z [Error: ENOENT: no such file or directory, open '/next/.next/BUILD_ID'] {
-DEFAULT 2025-03-27T10:01:15.784321Z errno: -2,
-DEFAULT 2025-03-27T10:01:15.784328Z code: 'ENOENT',
-DEFAULT 2025-03-27T10:01:15.784336Z syscall: 'open',
-DEFAULT 2025-03-27T10:01:15.784341Z path: '/next/.next/BUILD_ID'
-DEFAULT 2025-03-27T10:01:15.784348Z }
+2025-03-27 12:41:41.555 CET
+[0m [90m | [39m [31m[1m^[22m[39m[0m
+2025-03-27 12:41:41.555 CET
+[0m [90m 2 | [39m[0m
+2025-03-27 12:41:41.555 CET
+[0m [90m 3 | [39m[36mimport[39m { useAuth } [36mfrom[39m [32m"./useAuth"[39m[33m;[39m[0m
+2025-03-27 12:41:41.555 CET
+[0m [90m 4 | [39m[36mimport[39m type { [33mCreateAgentProps[39m[33m,[39m [33mSaveAgentProps[39m } [36mfrom[39m [32m"../server/api/routers/agentRouter"[39m[33m;[39m[0m
+2025-03-27 12:41:41.658 CET
+Running command: npm run start
+2025-03-27 12:41:42.094 CET
+> agent-gpt@1.0.0 start
+2025-03-27 12:41:42.094 CET
+> next start
+2025-03-27 12:41:42.829 CET
+Default STARTUP TCP probe succeeded after 1 attempt for container "placeholder-1" on port 8080.
+2025-03-27 12:41:43.155 CET
+[Error: ENOENT: no such file or directory, scandir '/next/.next/static'] {
+2025-03-27 12:41:43.155 CET
+errno: -2,
+2025-03-27 12:41:43.155 CET
+code: 'ENOENT',
+2025-03-27 12:41:43.155 CET
+syscall: 'scandir',
+2025-03-27 12:41:43.155 CET
+path: '/next/.next/static'
+2025-03-27 12:41:43.155 CET
+}
