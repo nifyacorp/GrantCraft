@@ -38,11 +38,8 @@ RUN mkdir -p prisma && \
       printf "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id            String   @id @default(cuid())\n  name          String?\n  email         String?  @unique\n  emailVerified DateTime?\n  image         String?\n  createdAt     DateTime @default(now())\n  updatedAt     DateTime @updatedAt\n}\n" > prisma/schema.prisma; \
     fi
 
-# Build the application during image creation if NODE_ENV is production
-# Skip prisma generate during build since it will be handled in entrypoint.sh
-RUN if [ "$NODE_ENV" = "production" ]; then \
-      NODE_ENV=production npm run build; \
-    fi
+# Don't build the application during image creation to avoid env variable issues
+# The build will happen in entrypoint.sh where environment variables are properly set
 
 # Expose the port the app will run on
 EXPOSE 3000

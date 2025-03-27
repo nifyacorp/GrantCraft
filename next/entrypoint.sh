@@ -16,10 +16,20 @@ dos2unix .env.temp 2>/dev/null || echo "dos2unix failed, continuing anyway"
 cat .env.temp > .env 2>/dev/null || echo "Failed to write to .env, creating new one"
 rm -f .env.temp
 
-# Create default .env with DATABASE_URL if needed
+# Create comprehensive default .env file if needed
 if [ ! -f .env ] || ! grep -q "DATABASE_URL" .env; then
-  echo "Creating/updating .env with DATABASE_URL"
-  echo "DATABASE_URL=${DATABASE_URL:-mysql://reworkd_platform:reworkd_platform@34.66.109.248:3306/reworkd_platform}" > .env
+  echo "Creating/updating .env with required variables"
+  cat > .env << EOF
+# Database connection
+DATABASE_URL=${DATABASE_URL:-mysql://reworkd_platform:reworkd_platform@34.66.109.248:3306/reworkd_platform}
+
+# Next Auth
+NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-grantcraft_local_development_secret}
+NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+
+# Backend connection
+NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}
+EOF
 fi
 
 source .env || echo "Failed to source .env, continuing anyway"
@@ -122,7 +132,22 @@ fi
 # Check if .next/BUILD_ID exists, if not, run build
 if [ ! -f ".next/BUILD_ID" ]; then
   echo "BUILD_ID not found. Running build process..."
-  npm run build
+  echo "Current environment variables:"
+  echo "DATABASE_URL: $DATABASE_URL"
+  echo "NEXTAUTH_SECRET: $NEXTAUTH_SECRET"
+  echo "NEXTAUTH_URL: $NEXTAUTH_URL"
+  echo "NEXT_PUBLIC_BACKEND_URL: $NEXT_PUBLIC_BACKEND_URL"
+  echo "NODE_ENV: $NODE_ENV"
+  
+  # Force set environment variables for build process
+  export DATABASE_URL=${DATABASE_URL:-mysql://reworkd_platform:reworkd_platform@34.66.109.248:3306/reworkd_platform}
+  export NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-grantcraft_local_development_secret}
+  export NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+  export NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}
+  export NODE_ENV=${NODE_ENV:-production}
+  
+  # Run build with environment variables properly set
+  NODE_ENV=$NODE_ENV npm run build
 fi
 
 # For Cloud Run, always run in production mode instead of development
