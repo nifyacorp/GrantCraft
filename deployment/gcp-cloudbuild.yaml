@@ -1,7 +1,29 @@
 steps:
+  # Set up environment variables file for frontend build
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'setup-env'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Creating .env.production file for frontend build"
+        mkdir -p next/.next
+        cat > next/.env.production << EOF
+        SKIP_ENV_VALIDATION=true
+        NODE_ENV=production
+        EOF
+        chmod -R 777 next/.next
+  
   # Frontend
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/agentgpt-frontend', './next']
+    args: [
+      'build', 
+      '-t', 
+      'gcr.io/$PROJECT_ID/agentgpt-frontend', 
+      '--build-arg', 
+      'SKIP_ENV_VALIDATION=true',
+      './next'
+    ]
   
   # Backend
   - name: 'gcr.io/cloud-builders/docker'

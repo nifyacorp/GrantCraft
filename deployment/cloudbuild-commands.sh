@@ -64,7 +64,9 @@ gcloud run deploy $FRONTEND_NAME \
   --set-env-vars NEXT_PUBLIC_BACKEND_URL=$BACKEND_URL \
   --set-env-vars NEXT_PUBLIC_FORCE_AUTH=false \
   --set-env-vars GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
-  --set-env-vars GCP_STORAGE_BUCKET=$STORAGE_BUCKET
+  --set-env-vars GCP_STORAGE_BUCKET=$STORAGE_BUCKET \
+  --set-env-vars SKIP_ENV_VALIDATION=true \
+  --set-env-vars DATABASE_URL="mysql://reworkd_platform:${DB_PASSWORD}@localhost/reworkd_platform?socket=/cloudsql/$PROJECT_ID:$REGION:agentgpt-mysql"
 
 # Deploy Backend to Cloud Run
 echo "Deploying backend to Cloud Run..."

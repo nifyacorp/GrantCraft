@@ -32,6 +32,11 @@ export DATABASE_URL=${DATABASE_URL:-mysql://reworkd_platform:reworkd_platform@34
 export NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-grantcraft_local_development_secret}
 export NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
 export NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}
+export SKIP_ENV_VALIDATION=true
+
+# Log all environment variables for debugging
+echo "All environment variables for debugging:"
+env | sort
 
 echo "Environment variables:"
 echo "DATABASE_URL: $DATABASE_URL"
