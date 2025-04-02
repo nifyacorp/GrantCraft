@@ -6,9 +6,8 @@
 </p>
 <p align="center">
     <img alt="Node version" src="https://img.shields.io/static/v1?label=node&message=%20%3E=18&logo=node.js&color=2334D058" />
-      <a href="https://github.com/reworkd/AgentGPT/blob/master/README.md"><img src="https://img.shields.io/badge/lang-English-blue.svg" alt="English"></a>
-  <a href="https://github.com/reworkd/AgentGPT/blob/master/docs/README.zh-HANS.md"><img src="https://img.shields.io/badge/lang-简体中文-red.svg" alt="简体中文"></a>
-  <a href="https://github.com/reworkd/AgentGPT/blob/master/docs/README.hu-Cs4K1Sr4C.md"><img src="https://img.shields.io/badge/lang-Hungarian-red.svg" alt="Hungarian"></a>
+    <a href="#"><img src="https://img.shields.io/badge/platform-FastAPI-blue.svg" alt="Platform"></a>
+    <a href="#"><img src="https://img.shields.io/badge/frontend-Next.js-black.svg" alt="Frontend"></a>
 </p>
 
 <p align="center">
@@ -30,26 +29,33 @@ It will attempt to reach the goal by thinking of tasks to do, executing them, an
 ## ✨ Demo
 For the best experience, try [our site](https://grantcraft.ai) directly!
 
+## 🔍 Project Overview
+
+GrantCraft consists of two main components:
+
+- **Frontend**: A Next.js application with authentication, UI, and client logic
+- **Backend**: A FastAPI service handling AI agents and business logic
+
+For detailed documentation on each component, see:
+- [Frontend Documentation](FRONTEND-README.md)
+- [Backend Documentation](BACKEND-README.md)
+
 ## 👨‍🚀 Getting Started
 
-The easiest way to get started with GrantCraft is automatic setup CLI bundled with the project.
-The CLI sets up the following:
-- 🔐 [Environment variables](https://github.com/GrantCraft/GrantCraft/blob/main/.env.example) (and API Keys)
-- 🗂️ [Database](https://github.com/GrantCraft/GrantCraft/tree/main/db) (MySQL)
-- 🤖 [Backend](https://github.com/GrantCraft/GrantCraft/tree/main/platform) (FastAPI)
-- 🎨 [Frontend](https://github.com/GrantCraft/GrantCraft/tree/main/next) (Next.js)
-
-## Prerequisites
+### Prerequisites
 
 Before you get started, please make sure you have the following installed:
 
 - An editor of your choice, like [Visual Studio Code](https://code.visualstudio.com/download)
 - [Node.js](https://nodejs.org/en/download) (>=18.0.0 <19.0.0)
+- [Python 3.9+](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/downloads)
 - [Docker](https://www.docker.com/products/docker-desktop) (create an account, open the Docker application, and sign in)
 - An [OpenAI API key](https://platform.openai.com/signup)
+- A MySQL database
 
-## Getting Started
+### Installation
+
 1. **Clone the Repository and Navigate into the Directory**
 
    **For Mac/Linux users**
@@ -64,7 +70,47 @@ Before you get started, please make sure you have the following installed:
    cd GrantCraft
    ./setup.bat
    ```
+
 2. **Follow the setup instructions from the script** - add the appropriate API keys, and once all of the services are running, visit [http://localhost:3000](http://localhost:3000) in your web browser.
+
+### Manual Setup
+
+If you prefer to set up the components manually:
+
+#### Frontend (Next.js)
+
+```bash
+cd next
+npm install
+npx prisma db push  # Apply database schema
+npm run dev
+```
+
+#### Backend (FastAPI)
+
+```bash
+cd platform
+poetry install
+poetry run uvicorn reworkd_platform.__main__:app --reload
+```
+
+## 🔧 Configuration
+
+### Database Setup
+
+For OAuth login to work, you need to ensure the database has all required tables:
+
+```bash
+cd next
+./apply-schema.sh
+```
+
+This script will apply the complete schema including the Account and Session tables needed for NextAuth.js.
+
+### Authentication Options
+
+1. **Development Bypass**: Use username "ratonxi" to bypass login
+2. **OAuth Providers**: Configure Google, GitHub, or Discord auth in your .env file
 
 ## 🚀 Tech Stack
 
@@ -73,6 +119,38 @@ Before you get started, please make sure you have the following installed:
 - ✅ **Database**: [Prisma](https://prisma.io) + [MySQL](https://mysql.com)
 - ✅ **Styling**: [TailwindCSS](https://tailwindcss.com) + [HeadlessUI](https://headlessui.com)
 - ✅ **LLM Tooling**: [Langchain](https://github.com/hwchase17/langchain)
+
+## 🐳 Docker Deployment
+
+Build and deploy both services:
+
+```bash
+docker-compose up -d
+```
+
+Or deploy to Cloud Run:
+
+```bash
+# Frontend
+cd next
+./cloudrun-build.sh
+
+# Backend
+cd platform
+gcloud builds submit --config=cloudbuild.yaml
+```
+
+## 🧪 Testing
+
+```bash
+# Frontend tests
+cd next
+npm run test
+
+# Backend tests
+cd platform
+poetry run pytest
+```
 
 ## 💪 Contributors 
 
