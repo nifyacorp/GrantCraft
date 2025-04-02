@@ -8,10 +8,9 @@
     "test:all": "node run-tests.js all",
     "test:frontend": "node run-tests.js frontend",
     "test:backend": "node run-tests.js backend",
-    "test:database": "node run-tests.js database",
-    "test:login": "node run-tests.js login",
-    "test:errors": "node run-tests.js errors",
-    "bypass-login": "node bypass-login.js"
+    "test:docs": "node run-tests.js docs",
+    "test:schema": "node run-tests.js schema",
+    "test:endpoint": "node run-tests.js endpoint"
   },
   "keywords": [
     "test",

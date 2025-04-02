@@ -140,8 +140,8 @@ function makeApiRequest(options) {
         reject(error);
       });
       
-      // Set request timeout
-      req.setTimeout(10000, () => {
+      // Set request timeout - increased to 30 seconds to handle slow connections
+      req.setTimeout(30000, () => {
         req.abort();
         reject(new Error('Request timeout'));
       });
