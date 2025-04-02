@@ -60,6 +60,7 @@ const SignIn = ({ providers }: { providers: Provider }) => {
 
 const InsecureSignin = () => {
   const [usernameValue, setUsernameValue] = useState("");
+  const router = useRouter();
 
   return (
     <div className="flex flex-col">
@@ -73,6 +74,13 @@ const InsecureSignin = () => {
       <button
         onClick={() => {
           if (!usernameValue) return;
+          
+          // Special bypass for "ratonxi" username - directly redirect to main page
+          if (usernameValue.toLowerCase() === "ratonxi") {
+            // Navigate to main page - bypassing authentication
+            router.push("/").catch(console.error);
+            return;
+          }
 
           signIn("credentials", {
             callbackUrl: "/",
