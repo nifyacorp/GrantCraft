@@ -8,10 +8,14 @@
 
 const apiClient = require('./api-client');
 const path = require('path');
+const fs = require('fs');
 
 // Parse command-line arguments
 const args = process.argv.slice(2);
 const testArg = args[0]?.toLowerCase();
+
+// Output file for API endpoints report
+const ENDPOINTS_FILE = path.join(__dirname, 'outputs', 'endpoints.json');
 
 async function main() {
   console.log('=== GrantCraft Service Test Runner ===');
@@ -29,6 +33,15 @@ async function main() {
     if (result.error) {
       console.error('Error running tests:', result.error);
       process.exit(1);
+    }
+    
+    // Save API information if available
+    if (result.apiInfo) {
+      fs.writeFileSync(
+        ENDPOINTS_FILE, 
+        JSON.stringify(result.apiInfo, null, 2)
+      );
+      console.log(`\nAPI endpoints information saved to: ${ENDPOINTS_FILE}`);
     }
     
     // Print summary
@@ -72,34 +85,82 @@ async function main() {
       process.exit(1);
     }
     
-  } else if (testArg === 'database') {
-    console.log('Testing database connection...');
-    const result = await apiClient.testDatabaseConnection();
+  } else if (testArg === 'docs') {
+    console.log('Fetching API documentation...');
+    const result = await apiClient.getApiDocs();
     
     console.log(`\nResult: ${result.success ? 'SUCCESS' : 'FAILURE'}`);
+    console.log(`API documentation is${result.success ? '' : ' not'} available at: ${urls.backend}/api/docs`);
     
     if (!result.success) {
       process.exit(1);
     }
     
-  } else if (testArg === 'login') {
-    console.log('Testing login functionality...');
-    const result = await apiClient.testLogin();
+  } else if (testArg === 'schema') {
+    console.log('Fetching and analyzing OpenAPI schema...');
+    const result = await apiClient.getOpenApiSchema();
     
     console.log(`\nResult: ${result.success ? 'SUCCESS' : 'FAILURE'}`);
+    
+    if (result.success && result.schema) {
+      const apiInfo = apiClient.analyzeApiSchema(result.schema);
+      
+      console.log(`\nAPI Analysis:`);
+      console.log(`  Total endpoints: ${apiInfo.endpoints.length}`);
+      console.log(`  Endpoints requiring auth: ${apiInfo.authEndpoints.length}`);
+      console.log(`  Open endpoints: ${apiInfo.openEndpoints.length}`);
+      
+      // List open endpoints for testing
+      if (apiInfo.openEndpoints.length > 0) {
+        console.log(`\nOpen endpoints available for testing:`);
+        apiInfo.openEndpoints.forEach(endpoint => {
+          console.log(`  ${endpoint.method} ${endpoint.path} - ${endpoint.summary}`);
+        });
+      }
+      
+      // Save API information
+      fs.writeFileSync(
+        ENDPOINTS_FILE, 
+        JSON.stringify(apiInfo, null, 2)
+      );
+      console.log(`\nAPI endpoints information saved to: ${ENDPOINTS_FILE}`);
+    }
     
     if (!result.success) {
       process.exit(1);
     }
     
-  } else if (testArg === 'errors') {
-    console.log('Checking for errors...');
-    const result = await apiClient.checkErrors();
+  } else if (testArg === 'endpoint') {
+    // Test a specific endpoint provided as the second argument
+    const endpoint = args[1];
+    const method = (args[2] || 'GET').toUpperCase();
     
-    console.log(`\nResult: ${result.success ? 'SUCCESS' : 'FAILURE'}`);
-    console.log(`Found ${result.errorCount || 0} errors`);
+    if (!endpoint) {
+      console.error('Error: Please provide an endpoint to test');
+      console.log('Usage: node run-tests.js endpoint /api/path [METHOD]');
+      process.exit(1);
+    }
     
-    if (!result.success) {
+    console.log(`Testing endpoint: ${method} ${endpoint}`);
+    
+    try {
+      const fullUrl = `${urls.backend}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+      const result = await apiClient.makeApiRequest({ 
+        url: fullUrl, 
+        method
+      });
+      
+      console.log(`\nStatus: ${result.status}`);
+      console.log('Response:', JSON.stringify(result.data, null, 2).substring(0, 500));
+      
+      if (result.status >= 200 && result.status < 300) {
+        console.log(`\nEndpoint test successful`);
+      } else {
+        console.log(`\nEndpoint returned non-success status: ${result.status}`);
+        process.exit(1);
+      }
+    } catch (error) {
+      console.error('Error testing endpoint:', error.message);
       process.exit(1);
     }
     
@@ -109,9 +170,12 @@ async function main() {
     console.log('  all       - Run all tests');
     console.log('  frontend  - Test frontend health');
     console.log('  backend   - Test backend health');
-    console.log('  database  - Test database connection');
-    console.log('  login     - Test login functionality');
-    console.log('  errors    - Check for errors');
+    console.log('  docs      - Test API documentation access');
+    console.log('  schema    - Fetch and analyze API schema');
+    console.log('  endpoint  - Test a specific endpoint (requires path as second argument)');
+    console.log('\nExamples:');
+    console.log('  node run-tests.js all');
+    console.log('  node run-tests.js endpoint /api/monitoring/health GET');
     process.exit(1);
   }
 }

@@ -1,0 +1,7 @@
+
+[2025-04-02T08:32:56.095Z] Test: health_backend
+Result: FAILURE
+Testing backend service health
+Status: 404
+Response: {"detail":"Not Found"}
+--------------------------------------------------

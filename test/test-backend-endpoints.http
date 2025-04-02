@@ -1,0 +1,30 @@
+# GrantCraft Backend API Test Requests
+# Use with REST Client or similar tools
+
+### Check if backend is running
+GET https://grantcraft-backend-320165158819.us-central1.run.app/
+
+### Health check (debug endpoint)
+GET https://grantcraft-backend-320165158819.us-central1.run.app/api/debug/health
+
+### Ping endpoint
+GET https://grantcraft-backend-320165158819.us-central1.run.app/api/debug/ping
+
+### Test login functionality
+GET https://grantcraft-backend-320165158819.us-central1.run.app/api/debug/test/login
+    ?username=test@example.com
+    &password=password123
+
+### Check for errors
+GET https://grantcraft-backend-320165158819.us-central1.run.app/api/debug/errors
+    ?password=GrantCraft2025!Debug
+
+### Test database connection
+GET https://grantcraft-backend-320165158819.us-central1.run.app/api/debug/test/database
+    ?password=GrantCraft2025!Debug
+
+### General API health
+GET https://grantcraft-backend-320165158819.us-central1.run.app/api/health
+
+### Check API docs
+GET https://grantcraft-backend-320165158819.us-central1.run.app/api/docs

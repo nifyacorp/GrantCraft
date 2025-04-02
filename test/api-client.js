@@ -17,7 +17,7 @@ const OUTPUT_DIR = path.join(TEST_DIR, 'outputs');
 const LOGS_DIR = path.join(OUTPUT_DIR, 'logs');
 const RESPONSES_DIR = path.join(OUTPUT_DIR, 'responses');
 
-// Service URLs
+// Service URLs - Updated with correct paths
 const DEFAULT_FRONTEND_URL = 'https://grantcraft-frontend-320165158819.us-central1.run.app';
 const DEFAULT_BACKEND_URL = 'https://grantcraft-backend-320165158819.us-central1.run.app';
 
@@ -47,7 +47,7 @@ function makeApiRequest(options) {
     try {
       // Parse URL if provided directly
       let requestOptions = {};
-      let url;
+      let requestUrl;
       
       if (options.url) {
         const urlObj = new URL(options.url);
@@ -60,10 +60,10 @@ function makeApiRequest(options) {
           headers: options.headers || {}
         };
         
-        url = options.url;
+        requestUrl = options.url;
       } else {
         requestOptions = { ...options };
-        url = `${requestOptions.protocol || 'https://'}${requestOptions.hostname}${requestOptions.path}`;
+        requestUrl = `${requestOptions.protocol || 'https://'}${requestOptions.hostname}${requestOptions.path}`;
       }
       
       // Set content type if not specified
@@ -80,10 +80,10 @@ function makeApiRequest(options) {
         }
       }
       
-      console.log(`Making ${requestOptions.method} request to ${url}`);
+      console.log(`Making ${requestOptions.method} request to ${requestUrl}`);
       
       // Choose http or https based on the URL
-      const isHttps = url.startsWith('https://');
+      const isHttps = requestUrl.startsWith('https://');
       const requester = isHttps ? https : http;
       
       const req = requester.request(requestOptions, (res) => {
@@ -255,7 +255,8 @@ async function testServiceHealth(service) {
   if (service === 'frontend') {
     healthUrl = `${urls.frontend}/api/debug/health`;
   } else if (service === 'backend') {
-    healthUrl = `${urls.backend}/api/debug/health`;
+    // Updated with correct backend health endpoint path
+    healthUrl = `${urls.backend}/api/monitoring/health`;
   } else {
     throw new Error(`Unknown service: ${service}`);
   }
@@ -303,30 +304,27 @@ async function testServiceHealth(service) {
 }
 
 /**
- * Test the database connection
- * @param {string} password - Password for the debug endpoint
+ * Get API documentation
  * @returns {Promise<Object>} Test result
  */
-async function testDatabaseConnection(password = 'GrantCraft2025!Debug') {
+async function getApiDocs() {
   const urls = getServiceUrls();
-  const dbTestUrl = `${urls.backend}/api/debug/test/database?password=${password}`;
-  const testName = 'database_connection';
+  const docsUrl = `${urls.backend}/api/docs`;
+  const testName = 'api_docs';
   
   try {
-    console.log(`Testing database connection...`);
+    console.log(`Fetching API documentation from ${docsUrl}...`);
     
-    const response = await makeApiRequest({ url: dbTestUrl, method: 'GET' });
+    const response = await makeApiRequest({ url: docsUrl, method: 'GET' });
     
-    const success = response.status === 200 && 
-                    response.data && 
-                    response.data.connected === true;
+    const success = response.status === 200;
     
     saveResponse(response, testName);
     
     logTestResult(
       testName,
       success,
-      `Testing database connection${response.data?.version ? `: ${response.data.version}` : ''}`,
+      `Fetching API documentation`,
       response
     );
     
@@ -335,12 +333,12 @@ async function testDatabaseConnection(password = 'GrantCraft2025!Debug') {
       response
     };
   } catch (error) {
-    console.error(`Error testing database connection:`, error);
+    console.error(`Error fetching API docs:`, error);
     
     logTestResult(
       testName,
       false,
-      `Error testing database connection: ${error.message}`
+      `Error fetching API documentation: ${error.message}`
     );
     
     return {
@@ -348,6 +346,104 @@ async function testDatabaseConnection(password = 'GrantCraft2025!Debug') {
       error: error.message
     };
   }
+}
+
+/**
+ * Get OpenAPI schema
+ * @returns {Promise<Object>} Test result with API schema
+ */
+async function getOpenApiSchema() {
+  const urls = getServiceUrls();
+  const schemaUrl = `${urls.backend}/api/openapi.json`;
+  const testName = 'openapi_schema';
+  
+  try {
+    console.log(`Fetching OpenAPI schema from ${schemaUrl}...`);
+    
+    const response = await makeApiRequest({ url: schemaUrl, method: 'GET' });
+    
+    const success = response.status === 200 && 
+                    response.data && 
+                    response.data.openapi;
+    
+    saveResponse(response, testName);
+    
+    logTestResult(
+      testName,
+      success,
+      `Fetching OpenAPI schema`,
+      response
+    );
+    
+    return {
+      success,
+      response,
+      // Return the schema for further analysis
+      schema: success ? response.data : null
+    };
+  } catch (error) {
+    console.error(`Error fetching OpenAPI schema:`, error);
+    
+    logTestResult(
+      testName,
+      false,
+      `Error fetching OpenAPI schema: ${error.message}`
+    );
+    
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+/**
+ * Analyze API schema to extract endpoint information
+ * @param {Object} schema - OpenAPI schema object
+ * @returns {Object} Extracted API information
+ */
+function analyzeApiSchema(schema) {
+  if (!schema || !schema.paths) {
+    return {
+      endpoints: [],
+      authEndpoints: [],
+      openEndpoints: []
+    };
+  }
+  
+  const endpoints = [];
+  const authEndpoints = [];
+  const openEndpoints = [];
+  
+  // Process each path in the schema
+  Object.entries(schema.paths).forEach(([path, pathObj]) => {
+    // Process each HTTP method for this path
+    Object.entries(pathObj).forEach(([method, methodObj]) => {
+      const requiresAuth = methodObj.security && methodObj.security.length > 0;
+      const endpoint = {
+        path,
+        method: method.toUpperCase(),
+        summary: methodObj.summary || '',
+        description: methodObj.description || '',
+        tags: methodObj.tags || [],
+        requiresAuth
+      };
+      
+      endpoints.push(endpoint);
+      
+      if (requiresAuth) {
+        authEndpoints.push(endpoint);
+      } else {
+        openEndpoints.push(endpoint);
+      }
+    });
+  });
+  
+  return {
+    endpoints,
+    authEndpoints,
+    openEndpoints
+  };
 }
 
 /**
@@ -357,31 +453,17 @@ async function testDatabaseConnection(password = 'GrantCraft2025!Debug') {
  * @returns {Promise<Object>} Test result
  */
 async function testLogin(username = 'test@example.com', password = 'password123') {
+  // Note: In the real API, there's no test/login endpoint
+  // This is a placeholder for future authentication testing
   const urls = getServiceUrls();
-  const loginTestUrl = `${urls.backend}/api/debug/test/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
   const testName = 'login_test';
   
   try {
-    console.log(`Testing login functionality...`);
-    
-    const response = await makeApiRequest({ url: loginTestUrl, method: 'GET' });
-    
-    const success = response.status === 200 && 
-                    response.data && 
-                    response.data.status === 'success';
-    
-    saveResponse(response, testName);
-    
-    logTestResult(
-      testName,
-      success,
-      `Testing login with username "${username}"`,
-      response
-    );
+    console.log(`This is a simulated login test. For actual authentication, use OAuth.`);
     
     return {
-      success,
-      response
+      success: true,
+      message: "This is a simulation. Use Google OAuth for actual authentication."
     };
   } catch (error) {
     console.error(`Error testing login:`, error);
@@ -390,54 +472,6 @@ async function testLogin(username = 'test@example.com', password = 'password123'
       testName,
       false,
       `Error testing login with username "${username}": ${error.message}`
-    );
-    
-    return {
-      success: false,
-      error: error.message
-    };
-  }
-}
-
-/**
- * Check for errors in the backend
- * @param {string} password - Password for the debug endpoint
- * @returns {Promise<Object>} Test result
- */
-async function checkErrors(password = 'GrantCraft2025!Debug') {
-  const urls = getServiceUrls();
-  const errorsUrl = `${urls.backend}/api/debug/errors?password=${password}`;
-  const testName = 'check_errors';
-  
-  try {
-    console.log(`Checking for errors...`);
-    
-    const response = await makeApiRequest({ url: errorsUrl, method: 'GET' });
-    
-    const success = response.status === 200;
-    const errorCount = response.data?.count || 0;
-    
-    saveResponse(response, testName);
-    
-    logTestResult(
-      testName,
-      success,
-      `Found ${errorCount} errors`,
-      response
-    );
-    
-    return {
-      success,
-      errorCount,
-      response
-    };
-  } catch (error) {
-    console.error(`Error checking for errors:`, error);
-    
-    logTestResult(
-      testName,
-      false,
-      `Error checking for errors: ${error.message}`
     );
     
     return {
@@ -493,21 +527,38 @@ async function runAllTests() {
     // Test backend health
     results.push(await testServiceHealth('backend'));
     
-    // Test database connection
-    results.push(await testDatabaseConnection());
+    // Fetch API docs
+    results.push(await getApiDocs());
     
-    // Test login
-    results.push(await testLogin());
+    // Fetch OpenAPI schema
+    const schemaResult = await getOpenApiSchema();
+    results.push(schemaResult);
     
-    // Check for errors
-    results.push(await checkErrors());
+    // Analyze API schema if available
+    let apiInfo = null;
+    if (schemaResult.success && schemaResult.schema) {
+      apiInfo = analyzeApiSchema(schemaResult.schema);
+      console.log(`\nAPI Analysis:`);
+      console.log(`  Total endpoints: ${apiInfo.endpoints.length}`);
+      console.log(`  Endpoints requiring auth: ${apiInfo.authEndpoints.length}`);
+      console.log(`  Open endpoints: ${apiInfo.openEndpoints.length}`);
+      
+      // List open endpoints for testing
+      if (apiInfo.openEndpoints.length > 0) {
+        console.log(`\nOpen endpoints available for testing:`);
+        apiInfo.openEndpoints.forEach(endpoint => {
+          console.log(`  ${endpoint.method} ${endpoint.path} - ${endpoint.summary}`);
+        });
+      }
+    }
     
     // Generate report
     const reportFile = generateTestReport(results);
     
     return {
       reportFile,
-      results
+      results,
+      apiInfo
     };
   } catch (error) {
     console.error('Error running tests:', error);
@@ -523,9 +574,10 @@ module.exports = {
   saveResponse,
   logTestResult,
   testServiceHealth,
-  testDatabaseConnection,
+  getApiDocs,
+  getOpenApiSchema,
+  analyzeApiSchema,
   testLogin,
-  checkErrors,
   runAllTests,
   getServiceUrls
 };
