@@ -10,7 +10,8 @@
     "test:backend": "node run-tests.js backend",
     "test:database": "node run-tests.js database",
     "test:login": "node run-tests.js login",
-    "test:errors": "node run-tests.js errors"
+    "test:errors": "node run-tests.js errors",
+    "bypass-login": "node bypass-login.js"
   },
   "keywords": [
     "test",
