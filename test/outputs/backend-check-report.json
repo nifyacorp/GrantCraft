@@ -1,0 +1,64 @@
+{
+  "timestamp": "2025-04-02T11:22:06.681Z",
+  "backendUrl": "https://grantcraft-backend-320165158819.us-central1.run.app",
+  "summary": {
+    "total": 5,
+    "successful": 4,
+    "failed": 1
+  },
+  "results": [
+    {
+      "endpoint": "Health Check",
+      "success": true,
+      "status": 200,
+      "data": {
+        "service": "backend",
+        "status": "ok",
+        "timestamp": "2025-04-02T11:23:20.654704",
+        "version": "development"
+      },
+      "duration": 349
+    },
+    {
+      "endpoint": "Database Connection",
+      "success": true,
+      "status": 200,
+      "data": {
+        "status": "error",
+        "connected": false,
+        "message": "Database connection error: (pymysql.err.OperationalError) (2003, \"Can't connect to MySQL server on '34.66.109.248'\")\n(Background on this error at: https://sqlalche.me/e/20/e3q8)"
+      },
+      "duration": 145
+    },
+    {
+      "endpoint": "List Tables",
+      "success": true,
+      "status": 200,
+      "data": {
+        "status": "error",
+        "message": "(pymysql.err.OperationalError) (2003, \"Can't connect to MySQL server on '34.66.109.248'\")\n(Background on this error at: https://sqlalche.me/e/20/e3q8)"
+      },
+      "duration": 145
+    },
+    {
+      "endpoint": "Required Tables",
+      "success": false,
+      "error": "Cannot read properties of undefined (reading 'filter')"
+    },
+    {
+      "endpoint": "Comprehensive Check",
+      "success": true,
+      "status": 200,
+      "data": {
+        "status": "error",
+        "connection": {
+          "status": "error",
+          "connected": false,
+          "message": "Database connection error: (pymysql.err.OperationalError) (2003, \"Can't connect to MySQL server on '34.66.109.248'\")\n(Background on this error at: https://sqlalche.me/e/20/e3q8)"
+        },
+        "message": "Database connection failed"
+      },
+      "duration": 136
+    }
+  ]
+}

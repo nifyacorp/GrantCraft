@@ -73,6 +73,9 @@ class Settings(BaseSettings):
     allowed_origins_regex: Optional[str] = None
 
     # Variables for the database
+    # Primary database connection string (takes precedence if provided)
+    database_url: Optional[str] = None
+    # Individual database connection components (used as fallback)
     db_host: str = "localhost"
     db_port: int = 3308
     db_user: str = "reworkd_platform"
@@ -124,6 +127,47 @@ class Settings(BaseSettings):
 
     @property
     def db_url(self) -> URL:
+        # If DATABASE_URL is provided, use it directly
+        if self.database_url:
+            # Convert string to URL object
+            try:
+                # Handle Cloud SQL Proxy format
+                if "?host=/cloudsql/" in self.database_url:
+                    # Parse mysql://user:pass@localhost/dbname?host=/cloudsql/instance format
+                    parts = self.database_url.split("?host=")
+                    base_url = parts[0]
+                    # Convert to proper SQLAlchemy URL format
+                    url = URL(base_url)
+                    # Add aiomysql driver for async support
+                    scheme = "mysql+aiomysql" if url.scheme == "mysql" else url.scheme
+                    return URL.build(
+                        scheme=scheme,
+                        host=url.host,
+                        port=url.port,
+                        user=url.user,
+                        password=url.password,
+                        path=url.path,
+                        # Add Unix socket path for Cloud SQL
+                        query={"unix_socket": parts[1]} if parts[1].startswith("/cloudsql/") else {},
+                    )
+                else:
+                    # Regular database URL
+                    url = URL(self.database_url)
+                    # Add aiomysql driver for async support if needed
+                    scheme = "mysql+aiomysql" if url.scheme == "mysql" else url.scheme
+                    return URL.build(
+                        scheme=scheme,
+                        host=url.host,
+                        port=url.port,
+                        user=url.user,
+                        password=url.password,
+                        path=url.path,
+                    )
+            except Exception:
+                # Fall back to component-based URL if parsing fails
+                pass
+                
+        # Fall back to building URL from components
         return URL.build(
             scheme="mysql+aiomysql",
             host=self.db_host,

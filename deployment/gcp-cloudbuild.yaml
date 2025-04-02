@@ -32,3 +32,9 @@ steps:
 images: 
   - 'gcr.io/$PROJECT_ID/agentgpt-frontend'
   - 'gcr.io/$PROJECT_ID/agentgpt-platform'
+  
+options:
+  machineType: 'E2_HIGHCPU_8'
+  diskSizeGb: '100'
+  dynamic_substitutions: true
+  logging: CLOUD_LOGGING_ONLY  

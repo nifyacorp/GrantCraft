@@ -1,125 +1,84 @@
-# GrantCraft Test and Debug Utilities
+# GrantCraft Testing Tools
 
-This directory contains comprehensive tools for testing, debugging, and monitoring the GrantCraft application. These tools help you verify the health and functionality of both frontend and backend services.
+This directory contains testing tools for the GrantCraft application. Use these tools to verify your setup and diagnose issues.
 
-## Features
+## Backend Database Check
 
-- Test frontend and backend health status
-- Access and analyze API documentation
-- Discover available endpoints through schema analysis
-- Test individual endpoints with customizable parameters
-- Generate detailed test reports and logs
+The `backend-db-check.js` script tests the database-related endpoints on the backend API.
 
-## Setup
+### Prerequisites
+
+Make sure you have the necessary dependencies:
 
 ```bash
-# Navigate to the test directory
-cd test
-
-# Install dependencies if needed
-# (No external dependencies required for basic functionality)
+npm install axios
 ```
 
-## Quick Start
+### Usage
+
+Run the script:
 
 ```bash
-# Run all tests
-node run-tests.js all
+# Test the production backend
+node backend-db-check.js
 
-# Or use npm scripts
-npm run test:all
+# Test a custom backend URL
+BACKEND_URL=http://localhost:8000 node backend-db-check.js
 ```
 
-## Available Tests
+The script will:
+1. Test the backend health endpoint
+2. Test database connection
+3. Check for required tables
+4. Generate a comprehensive report
+5. Save results to the `outputs` directory
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `all` | Run all tests | `node run-tests.js all` |
-| `frontend` | Test frontend health | `node run-tests.js frontend` |
-| `backend` | Test backend health | `node run-tests.js backend` |
-| `docs` | Verify API docs access | `node run-tests.js docs` |
-| `schema` | Analyze API schema | `node run-tests.js schema` |
-| `endpoint` | Test specific endpoint | `node run-tests.js endpoint /api/monitoring/health GET` |
+### Output
 
-## Backend Debugging Strategy
+The script generates:
+- Console output with test results
+- JSON files with detailed responses from each endpoint
+- A comprehensive report at `outputs/backend-check-report.json`
+- Recommendations based on the test results
 
-The test framework implements a robust debugging strategy for the backend:
+### Endpoints Tested
 
-1. **Health Checks**: Regular health checks to detect service availability
+1. **Health Check** - Basic health check that should always work
+2. **Database Connection** - Checks if backend can connect to database
+3. **List Tables** - Lists all tables in the database
+4. **Required Tables** - Checks if all required tables exist
+5. **Comprehensive Check** - Full database diagnostic with recommendations
+
+## Fixing Database Issues
+
+If the tests show missing tables (especially Account or Session tables needed for OAuth), follow these steps:
+
+1. Apply the Prisma schema:
    ```bash
-   node run-tests.js backend
+   cd ../next
+   ./apply-schema.sh
    ```
 
-2. **API Documentation Analysis**: Automated discovery of available endpoints
+2. Or manually run Prisma migrations:
    ```bash
-   node run-tests.js schema
+   cd ../next
+   npx prisma db push
    ```
-   - This generates a list of all endpoints in `outputs/endpoints.json`
-   - Identifies which endpoints require authentication
-   - Provides summaries and descriptions for each endpoint
 
-3. **Individual Endpoint Testing**: Test specific endpoints directly
+3. Re-run the tests to verify the fix:
    ```bash
-   node run-tests.js endpoint /api/monitoring/health GET
+   cd ../test
+   node backend-db-check.js
    ```
 
-4. **Comprehensive Reporting**: All tests generate detailed logs and reports
-   - Response data saved to `outputs/responses/`
-   - Test results logged to `outputs/logs/test-results.log`
-   - Test reports generated as `outputs/test-report_*.json`
+## Troubleshooting
 
-## Known Issues and Workarounds
+If the tests fail with connection errors:
+- Verify the backend is running
+- Check if the backend URL is correct
+- Verify the backend has access to the database
 
-### Timeouts
-If you experience timeouts when connecting to backend services, the timeout has been increased to 30 seconds in the script. You can further increase it by modifying the `setTimeout` value in `api-client.js`.
-
-### Authentication
-Most backend endpoints require authentication via Google OAuth. When testing these endpoints:
-
-1. Use the Google OAuth setup documented in `GOOGLE-OAUTH-SETUP.md`
-2. For testing authenticated endpoints during development, use the OpenAPI UI at:
-   ```
-   https://grantcraft-backend-320165158819.us-central1.run.app/api/docs
-   ```
-
-## Usage Examples
-
-### Check if both services are healthy:
-```bash
-node run-tests.js all
-```
-
-### Analyze the API to discover endpoints:
-```bash
-node run-tests.js schema
-```
-
-### Test a specific endpoint:
-```bash
-node run-tests.js endpoint /api/monitoring/health GET
-```
-
-### Test the API documentation:
-```bash
-node run-tests.js docs
-```
-
-## Continuous Monitoring
-
-For continuous monitoring, you can set up a cron job to run these tests periodically:
-
-```bash
-# Add to crontab to run every 15 minutes
-*/15 * * * * cd /path/to/GrantCraft/test && node run-tests.js backend >> /var/log/grantcraft-monitoring.log 2>&1
-```
-
-## Extending the Tests
-
-The `api-client.js` module provides utilities for creating new test functions:
-
-- `makeApiRequest()`: Make HTTP requests with proper error handling
-- `saveResponse()`: Save response data to files
-- `logTestResult()`: Log test results
-- `analyzeApiSchema()`: Extract information from OpenAPI schema
-
-When adding new tests, follow the pattern in existing test functions.
+If the backend cannot connect to the database:
+- Check the DATABASE_URL environment variable
+- Verify the database server is running
+- Check network connectivity between backend and database

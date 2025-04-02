@@ -1,0 +1,5 @@
+{
+  "status": "error",
+  "connected": false,
+  "message": "Database connection error: (pymysql.err.OperationalError) (2003, \"Can't connect to MySQL server on '34.66.109.248'\")\n(Background on this error at: https://sqlalche.me/e/20/e3q8)"
+}
