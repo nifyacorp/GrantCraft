@@ -28,7 +28,7 @@ EOF
 fi
 
 # Export environment variables
-export DATABASE_URL=${DATABASE_URL:-mysql://reworkd_platform:reworkd_platform@34.66.109.248:3306/reworkd_platform}
+export DATABASE_URL=${DATABASE_URL:-mysql://reworkd_platform:reworkd_platform@agentgpt_db:3307/reworkd_platform}
 export NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-grantcraft_local_development_secret}
 export NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
 export NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}

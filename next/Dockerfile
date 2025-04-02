@@ -14,6 +14,10 @@ WORKDIR /next
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
+# Create minimal prisma directory and ensure-schema.js first
+RUN mkdir -p prisma
+COPY prisma/ensure-schema.js ./prisma/
+
 # Modify package.json to remove husky prepare script that tries to access parent directory
 RUN grep -v '"prepare":' package.json > package.json.tmp && \
     mv package.json.tmp package.json
