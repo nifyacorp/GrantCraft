@@ -1,0 +1,25 @@
+{
+  "name": "grantcraft-debug-tools",
+  "version": "1.0.0",
+  "description": "Simple debug tools for GrantCraft services",
+  "main": "debug-cli.js",
+  "bin": {
+    "grantcraft-debug": "./debug-cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "debug",
+    "cli",
+    "monitoring"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "ora": "^5.4.1"
+  }
+}
