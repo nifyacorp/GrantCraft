@@ -1,0 +1,33 @@
+steps:
+  # Build the backend container
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/agentgpt-platform', '.']
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'grantcraft-backend'
+      - '--image=gcr.io/$PROJECT_ID/agentgpt-platform'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--add-cloudsql-instances=grantcraft:us-central1:agentgpt-mysql'
+      - '--set-env-vars=REWORKD_PLATFORM_HOST=0.0.0.0'
+      - '--set-env-vars=REWORKD_PLATFORM_PORT=8000'
+      - '--set-env-vars=REWORKD_PLATFORM_ENVIRONMENT=production'
+      - '--set-env-vars=REWORKD_PLATFORM_LOG_LEVEL=DEBUG'
+      - '--set-env-vars=REWORKD_PLATFORM_DATABASE_URL=mysql+aiomysql://reworkd_platform:Platform_DB_Pass_2025!@/reworkd_platform?unix_socket=/cloudsql/grantcraft:us-central1:agentgpt-mysql'
+      - '--set-env-vars=REWORKD_PLATFORM_FRONTEND_URL=https://grantcraft-frontend-320165158819.us-central1.run.app'
+      - '--headers=Access-Control-Allow-Origin=*,Access-Control-Allow-Methods=GET;POST;PUT;DELETE;OPTIONS,Access-Control-Allow-Headers=Origin;Content-Type;Accept;Authorization;X-Requested-With,Access-Control-Max-Age=3600'
+
+images:
+  - 'gcr.io/$PROJECT_ID/agentgpt-platform'
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+  diskSizeGb: '100'
+  dynamic_substitutions: true
+  logging: CLOUD_LOGGING_ONLY
