@@ -19,7 +19,6 @@ export const get = async <T extends z.ZodTypeAny>(
   const response = await fetch(`${env.NEXT_PUBLIC_BACKEND_URL}${path}`, {
     method: "GET",
     headers: getHeaders(accessToken, organizationId),
-    credentials: "include",
   });
 
   if (!response.ok) {
@@ -41,7 +40,6 @@ export const post = async <T extends z.ZodTypeAny>(
     body: JSON.stringify(body),
     method: "POST",
     headers: getHeaders(accessToken, organizationId),
-    credentials: "include",
   });
 
   if (!response.ok) {
@@ -63,7 +61,6 @@ export const put = async <T extends z.ZodTypeAny>(
     body: JSON.stringify(body),
     method: "PUT",
     headers: getHeaders(accessToken, organizationId),
-    credentials: "include",
   });
 
   if (!response.ok) {
@@ -85,7 +82,6 @@ export const delete_ = async <T extends z.ZodTypeAny>(
     body: JSON.stringify(body),
     method: "DELETE",
     headers: getHeaders(accessToken, organizationId),
-    credentials: "include",
   });
 
   if (!response.ok) {

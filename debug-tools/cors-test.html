@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .button { padding: 10px; margin: 5px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        .result { margin-top: 15px; padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9; }
+        pre { margin: 0; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>CORS Test for GrantCraft Backend</h1>
+    
+    <div>
+        <button class="button" onclick="testEndpoint('/api/agent/tools')">Test GET /api/agent/tools</button>
+        <button class="button" onclick="testOptions('/api/agent/tools')">Test OPTIONS /api/agent/tools</button>
+        <button class="button" onclick="testEndpoint('/api/debug/health')">Test GET /api/debug/health</button>
+        <button class="button" onclick="testPost('/api/agent/start')">Test POST /api/agent/start</button>
+    </div>
+    
+    <div class="result">
+        <h3>Result:</h3>
+        <pre id="result">Click a button to test</pre>
+    </div>
+
+    <script>
+        const backendUrl = 'https://grantcraft-backend-320165158819.us-central1.run.app';
+        
+        function displayResult(data) {
+            document.getElementById('result').textContent = typeof data === 'object' ? 
+                JSON.stringify(data, null, 2) : data;
+        }
+        
+        async function testEndpoint(endpoint) {
+            try {
+                displayResult(`Fetching ${backendUrl}${endpoint}...`);
+                
+                const response = await fetch(`${backendUrl}${endpoint}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const headers = {};
+                response.headers.forEach((value, key) => {
+                    headers[key] = value;
+                });
+                
+                const result = {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: headers
+                };
+                
+                try {
+                    result.data = await response.json();
+                } catch (e) {
+                    result.data = await response.text();
+                }
+                
+                displayResult(result);
+            } catch (error) {
+                displayResult(`Error: ${error.message}`);
+            }
+        }
+        
+        async function testOptions(endpoint) {
+            try {
+                displayResult(`Sending OPTIONS to ${backendUrl}${endpoint}...`);
+                
+                const response = await fetch(`${backendUrl}${endpoint}`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'GET',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                
+                const headers = {};
+                response.headers.forEach((value, key) => {
+                    headers[key] = value;
+                });
+                
+                const result = {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: headers
+                };
+                
+                displayResult(result);
+            } catch (error) {
+                displayResult(`Error: ${error.message}`);
+            }
+        }
+        
+        async function testPost(endpoint) {
+            try {
+                displayResult(`Posting to ${backendUrl}${endpoint}...`);
+                
+                const response = await fetch(`${backendUrl}${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        goal: "Test goal",
+                        modelSettings: {
+                            customModelName: "gpt-3.5-turbo"
+                        }
+                    })
+                });
+                
+                const headers = {};
+                response.headers.forEach((value, key) => {
+                    headers[key] = value;
+                });
+                
+                const result = {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: headers
+                };
+                
+                try {
+                    result.data = await response.json();
+                } catch (e) {
+                    result.data = await response.text();
+                }
+                
+                displayResult(result);
+            } catch (error) {
+                displayResult(`Error: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
