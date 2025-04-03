@@ -10,6 +10,7 @@ export const post = async <T>(url: string, body: unknown, session?: Session) => 
   return (
     await axios.post(url, body, {
       headers,
+      withCredentials: true,
     })
   ).data as T;
 };
@@ -21,6 +22,7 @@ export const get = async <T>(url: string, session?: Session) => {
   return (
     await axios.get(url, {
       headers,
+      withCredentials: true,
     })
   ).data as T;
 };
@@ -34,6 +36,7 @@ export const delete_ = async <T>(url: string, accessToken?: string) => {
   return (
     await axios.delete(url, {
       headers,
+      withCredentials: true,
     })
   ).data as T;
 };
