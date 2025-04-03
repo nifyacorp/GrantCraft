@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-04-02T11:22:06.681Z",
+  "timestamp": "2025-04-02T11:36:45.333Z",
   "backendUrl": "https://grantcraft-backend-320165158819.us-central1.run.app",
   "summary": {
     "total": 5,
@@ -14,10 +14,10 @@
       "data": {
         "service": "backend",
         "status": "ok",
-        "timestamp": "2025-04-02T11:23:20.654704",
+        "timestamp": "2025-04-02T11:37:59.294333",
         "version": "development"
       },
-      "duration": 349
+      "duration": 347
     },
     {
       "endpoint": "Database Connection",
@@ -28,7 +28,7 @@
         "connected": false,
         "message": "Database connection error: (pymysql.err.OperationalError) (2003, \"Can't connect to MySQL server on '34.66.109.248'\")\n(Background on this error at: https://sqlalche.me/e/20/e3q8)"
       },
-      "duration": 145
+      "duration": 172
     },
     {
       "endpoint": "List Tables",
