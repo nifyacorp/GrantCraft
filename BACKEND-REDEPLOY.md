@@ -1,71 +1,83 @@
 # Backend Redeployment Guide
 
-After making changes to the database connection code, you need to rebuild and redeploy the backend. This document outlines the steps required.
+This document outlines the steps to redeploy the backend with the correct database configuration to fix connection issues.
 
-## 1. Rebuild the Backend Docker Image
+## Issue: Database Connection Errors
+
+The backend was experiencing database connection errors because of conflicting database configuration variables:
+
+```
+OperationalError(2003, "Can't connect to MySQL server on '34.66.109.248'")
+```
+
+## Solution
+
+The backend code has been updated to handle Cloud SQL connections correctly, but we need to redeploy with the proper environment variables.
+
+## Deployment Steps
+
+1. Build the Docker image
+2. Push to the Artifact Registry
+3. Deploy to Cloud Run with proper configuration
+
+### 1. Build the Docker image
 
 ```bash
-# Navigate to the platform directory
 cd platform
-
-# Build the Docker image
-docker build -t gcr.io/grantcraft-320165158819/agentgpt-platform:latest .
-
-# Push the image to Google Container Registry
-docker push gcr.io/grantcraft-320165158819/agentgpt-platform:latest
+gcloud builds submit --tag us-central1-docker.pkg.dev/grantcraft/backend/backend-service
 ```
 
-## 2. Redeploy to Cloud Run with Cloud SQL
+### 2. Deploy to Cloud Run
 
 ```bash
-# Deploy to Cloud Run with Cloud SQL connection
 gcloud run deploy grantcraft-backend \
-  --image gcr.io/grantcraft-320165158819/agentgpt-platform:latest \
-  --platform managed \
+  --image us-central1-docker.pkg.dev/grantcraft/backend/backend-service:latest \
   --region us-central1 \
+  --platform managed \
+  --allow-unauthenticated \
   --add-cloudsql-instances grantcraft:us-central1:agentgpt-mysql \
-  --set-env-vars "DATABASE_URL=mysql://reworkd_platform:Platform_DB_Pass_2025!@localhost/reworkd_platform?host=/cloudsql/grantcraft:us-central1:agentgpt-mysql"
+  --set-env-vars "REWORKD_PLATFORM_HOST=0.0.0.0" \
+  --set-env-vars "REWORKD_PLATFORM_PORT=8000" \
+  --set-env-vars "REWORKD_PLATFORM_ENVIRONMENT=production" \
+  --set-env-vars "REWORKD_PLATFORM_DATABASE_URL=mysql://reworkd_platform:Platform_DB_Pass_2025!@localhost/reworkd_platform?unix_socket=/cloudsql/grantcraft:us-central1:agentgpt-mysql" \
+  --set-env-vars "REWORKD_PLATFORM_FRONTEND_URL=https://grantcraft-frontend-giqpmq4sta-uc.a.run.app"
 ```
 
-## 3. Verify the Deployment
+### Important Notes
 
-After deployment completes, run the database check script:
+1. **Remove conflicting variables**: Do NOT include these variables in your deployment:
+   - REWORKD_PLATFORM_DB_HOST
+   - REWORKD_PLATFORM_DB_PORT
+   - REWORKD_PLATFORM_DB_USER
+   - REWORKD_PLATFORM_DB_PASS
+   - REWORKD_PLATFORM_DB_BASE
+   - REWORKD_PLATFORM_DB_CA_PATH
+
+2. **Use --add-cloudsql-instances**: This is required to enable the Cloud SQL Auth Proxy in Cloud Run
+
+3. **DATABASE_URL format**: Always use the unix_socket parameter with Cloud SQL:
+   ```
+   mysql://USERNAME:PASSWORD@localhost/DATABASE?unix_socket=/cloudsql/PROJECT:REGION:INSTANCE
+   ```
+
+## Verification Steps
+
+After deployment, verify that the backend is working correctly:
+
+1. Check the logs for any database connection errors
+2. Test the health endpoint: `https://[backend-url]/api/debug/health`
+3. Run the database verification script: `cd test && node db-check.js`
+
+## Rolling Back
+
+If you encounter issues after deployment, you can roll back to a previous revision:
 
 ```bash
-cd test
-node backend-db-check.js
+gcloud run services rollback grantcraft-backend --region us-central1
 ```
 
-## 4. Troubleshooting
+## Additional Resources
 
-If the database connection still fails:
-
-1. **Check Logs**: Review the Cloud Run service logs for errors
-   ```bash
-   gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=grantcraft-backend" --limit=50
-   ```
-
-2. **Verify Environment Variables**: Check that the environment variables are set correctly
-   ```bash
-   gcloud run services describe grantcraft-backend --format="value(spec.template.spec.containers[0].env)"
-   ```
-
-3. **Test Database Access**: Make sure the service account has access to the Cloud SQL instance
-   ```bash
-   gcloud projects add-iam-policy-binding PROJECT-ID \
-     --member="serviceAccount:SERVICE-ACCOUNT@PROJECT-ID.iam.gserviceaccount.com" \
-     --role="roles/cloudsql.client"
-   ```
-
-4. **Check Prisma Schema**: Make sure the Prisma schema in the frontend directory includes all the required tables
-   ```bash
-   cd next
-   npx prisma db push
-   ```
-
-## Important Notes
-
-- The backend code now looks for the `DATABASE_URL` environment variable first, then falls back to the individual database parameters if it's not found
-- The Cloud SQL instance connection name should be in the format `PROJECT-ID:REGION:INSTANCE-NAME`
-- The database connection string should use the special format with the Cloud SQL Auth Proxy
-- Any changes to the application code require a full rebuild and redeploy
+For more information, see:
+- [DATABASE-CONFIG.md](DATABASE-CONFIG.md) - Detailed database configuration guide
+- [Cloud Run with Cloud SQL documentation](https://cloud.google.com/run/docs/configuring/connect-cloudsql)

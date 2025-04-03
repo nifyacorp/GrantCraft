@@ -19,16 +19,18 @@ mysql://reworkd_platform:Platform_DB_Pass_2025!@34.66.109.248:3306/reworkd_platf
 
 ### Cloud SQL Proxy Format (For Google Cloud)
 
-When using Cloud SQL Auth Proxy, use this format:
+When using Cloud SQL Auth Proxy, use this format with unix_socket parameter:
 
 ```
-mysql://username:password@localhost/database_name?host=/cloudsql/PROJECT-ID:REGION:INSTANCE-NAME
+mysql://username:password@localhost/database_name?unix_socket=/cloudsql/PROJECT-ID:REGION:INSTANCE-NAME
 ```
 
 Example:
 ```
-mysql://reworkd_platform:Platform_DB_Pass_2025!@localhost/reworkd_platform?host=/cloudsql/grantcraft:us-central1:agentgpt-mysql
+mysql://reworkd_platform:Platform_DB_Pass_2025!@localhost/reworkd_platform?unix_socket=/cloudsql/grantcraft:us-central1:agentgpt-mysql
 ```
+
+**Important**: The older format with `?host=` is deprecated and should be replaced with `?unix_socket=`
 
 ## Deployment with Cloud SQL
 
@@ -38,7 +40,7 @@ When deploying to Cloud Run with Cloud SQL:
 gcloud run deploy SERVICE_NAME \
   --image IMAGE_URL \
   --add-cloudsql-instances PROJECT-ID:REGION:INSTANCE-NAME \
-  --set-env-vars "DATABASE_URL=mysql://username:password@localhost/database_name?host=/cloudsql/PROJECT-ID:REGION:INSTANCE-NAME"
+  --set-env-vars "DATABASE_URL=mysql://username:password@localhost/database_name?unix_socket=/cloudsql/PROJECT-ID:REGION:INSTANCE-NAME"
 ```
 
 ## Backend Changes
@@ -68,7 +70,28 @@ The frontend exclusively uses the `DATABASE_URL` environment variable with Prism
 
 ## Troubleshooting
 
-If experiencing database connection issues:
+### Common Errors
+
+#### "Can't connect to MySQL server on '34.66.109.248'"
+
+This error occurs when:
+- You're trying to connect directly to a Cloud SQL instance without using the Auth Proxy
+- You have both `DATABASE_URL` and individual DB parameters (like REWORKD_PLATFORM_DB_HOST) configured
+
+**Solution**: Remove all individual DB parameters and only use `DATABASE_URL` with the unix_socket format.
+
+#### "Can't connect to MySQL server on 'localhost'"
+
+This error occurs when:
+- Your Cloud SQL Auth Proxy setup is incorrect
+- The Unix socket path in DATABASE_URL is wrong
+
+**Solution**: 
+1. Ensure your Cloud Run service has the Cloud SQL connector enabled
+2. Verify the socket path is in the format: `/cloudsql/PROJECT:REGION:INSTANCE`
+3. Check that your Cloud SQL instance name is correct
+
+### General Troubleshooting Steps
 
 1. Verify the `DATABASE_URL` is correct
 2. Ensure the database is accessible from the service (check firewalls)
