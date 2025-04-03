@@ -122,6 +122,10 @@ fi
 echo "Generating Prisma client with ensure-schema.js"
 node prisma/ensure-schema.js
 
+# Push schema to database
+echo "Pushing Prisma schema to database"
+npx prisma db push --accept-data-loss
+
 # Create .next directory if it doesn't exist
 echo "Ensuring .next directory exists"
 mkdir -p .next
