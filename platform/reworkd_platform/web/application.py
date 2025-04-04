@@ -34,10 +34,10 @@ def get_app() -> FastAPI:
         default_response_class=UJSONResponse,
     )
 
-    # Temporarily allow all origins for debugging
+    # Configure CORS to allow specific frontend URLs
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Allow all origins temporarily
+        allow_origins=settings.all_frontend_urls,
         allow_origin_regex=settings.allowed_origins_regex,
         allow_credentials=True,
         allow_methods=["*"],

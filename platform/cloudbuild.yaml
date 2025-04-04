@@ -20,9 +20,7 @@ steps:
       - '--set-env-vars=REWORKD_PLATFORM_ENVIRONMENT=production'
       - '--set-env-vars=REWORKD_PLATFORM_LOG_LEVEL=DEBUG'
       - '--set-env-vars=REWORKD_PLATFORM_DATABASE_URL=mysql+aiomysql://reworkd_platform:Platform_DB_Pass_2025!@/reworkd_platform?unix_socket=/cloudsql/grantcraft:us-central1:agentgpt-mysql'
-      - '--set-env-vars=REWORKD_PLATFORM_FRONTEND_URL=*'
-      - '--set-env-vars=REWORKD_PLATFORM_ALLOWED_ORIGINS_REGEX=.*'
-      - '--headers=Access-Control-Allow-Origin=*,Access-Control-Allow-Methods=GET;POST;PUT;DELETE;OPTIONS,Access-Control-Allow-Headers=*,Access-Control-Max-Age=3600'
+      - '--set-env-vars=REWORKD_PLATFORM_FRONTEND_URL=https://grantcraft-frontend-320165158819.us-central1.run.app,https://grantcraft.ai,http://localhost:3000'
 
 images:
   - 'gcr.io/$PROJECT_ID/agentgpt-platform'
