@@ -39,6 +39,7 @@ GrantCraft consists of two main components:
 For detailed documentation on each component, see:
 - [Frontend Documentation](FRONTEND-README.md)
 - [Backend Documentation](BACKEND-README.md)
+- [Development Guide](CLAUDE.md) - Coding standards and practices
 
 ## 👨‍🚀 Getting Started
 
@@ -112,12 +113,27 @@ This script will apply the complete schema including the Account and Session tab
 1. **Development Bypass**: Use username "ratonxi" to bypass login
 2. **OAuth Providers**: Configure Google, GitHub, or Discord auth in your .env file
 
+## 🧪 Testing
+
+```bash
+# Frontend tests
+cd next
+npm run test
+# Run a single test
+npx jest path/to/test.ts
+
+# Backend tests
+cd platform
+poetry run pytest
+```
+
 ## 🚀 Tech Stack
 
 - ✅ **Framework**: [Next.js 13 + TypeScript](https://nextjs.org/) + [FastAPI](https://fastapi.tiangolo.com/)
 - ✅ **Auth**: [Next-Auth.js](https://next-auth.js.org)
 - ✅ **Database**: [Prisma](https://prisma.io) + [MySQL](https://mysql.com)
 - ✅ **Styling**: [TailwindCSS](https://tailwindcss.com) + [HeadlessUI](https://headlessui.com)
+- ✅ **State Management**: [Zustand](https://github.com/pmndrs/zustand)
 - ✅ **LLM Tooling**: [Langchain](https://github.com/hwchase17/langchain)
 
 ## 🐳 Docker Deployment
@@ -138,18 +154,6 @@ cd next
 # Backend
 cd platform
 gcloud builds submit --config=cloudbuild.yaml
-```
-
-## 🧪 Testing
-
-```bash
-# Frontend tests
-cd next
-npm run test
-
-# Backend tests
-cd platform
-poetry run pytest
 ```
 
 ## 💪 Contributors 

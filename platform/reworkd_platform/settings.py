@@ -71,6 +71,17 @@ class Settings(BaseSettings):
     # Frontend URL for CORS
     frontend_url: str = "http://localhost:3000"
     allowed_origins_regex: Optional[str] = None
+    
+    def _parse_frontend_urls(self) -> List[str]:
+        """Parse a comma-separated list of frontend URLs"""
+        if isinstance(self.frontend_url, str) and "," in self.frontend_url:
+            return [url.strip() for url in self.frontend_url.split(",")]
+        return [self.frontend_url]
+    
+    @property
+    def all_frontend_urls(self) -> List[str]:
+        """Get all frontend URLs as a list"""
+        return self._parse_frontend_urls()
 
     # Variables for the database
     # Primary database connection string - RECOMMENDED APPROACH FOR PRODUCTION
