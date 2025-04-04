@@ -1,22 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CORS Test</title>
+    <title>GrantCraft CORS Test</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .button { padding: 10px; margin: 5px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
-        .result { margin-top: 15px; padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9; }
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1 { color: #2563eb; }
+        .button { padding: 10px; margin: 5px; background-color: #2563eb; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        .button:hover { background-color: #1d4ed8; }
+        .result { margin-top: 15px; padding: 15px; border: 1px solid #ddd; background-color: #f9f9f9; border-radius: 8px; }
         pre { margin: 0; white-space: pre-wrap; }
+        input[type="text"] { padding: 8px; width: 100%; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .success { color: #16a34a; }
+        .error { color: #dc2626; }
+        .section { margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <h1>CORS Test for GrantCraft Backend</h1>
+    <h1>GrantCraft CORS Test - Updated</h1>
     
-    <div>
-        <button class="button" onclick="testEndpoint('/api/agent/tools')">Test GET /api/agent/tools</button>
-        <button class="button" onclick="testOptions('/api/agent/tools')">Test OPTIONS /api/agent/tools</button>
-        <button class="button" onclick="testEndpoint('/api/debug/health')">Test GET /api/debug/health</button>
-        <button class="button" onclick="testPost('/api/agent/start')">Test POST /api/agent/start</button>
+    <div class="section">
+        <h2>Backend URL</h2>
+        <input type="text" id="backendUrl" value="https://grantcraft-backend-320165158819.us-central1.run.app" placeholder="Enter backend URL...">
+    </div>
+    
+    <div class="section">
+        <h2>Test Endpoints</h2>
+        <button class="button" onclick="testEndpoint('/api/monitoring/health')">Test Health</button>
+        <button class="button" onclick="testEndpoint('/api/monitoring/cors-test')">Test CORS Endpoint</button>
+        <button class="button" onclick="testOptions('/api/monitoring/cors-test')">Test OPTIONS CORS</button>
+        <button class="button" onclick="testEndpoint('/api/auth/sid/info')">Test SID Auth</button>
+        <button class="button" onclick="testPost('/api/agent/start')">Test Agent Start</button>
     </div>
     
     <div class="result">
@@ -25,7 +38,9 @@
     </div>
 
     <script>
-        const backendUrl = 'https://grantcraft-backend-320165158819.us-central1.run.app';
+        function getBackendUrl() {
+            return document.getElementById('backendUrl').value.trim();
+        }
         
         function displayResult(data) {
             document.getElementById('result').textContent = typeof data === 'object' ? 
@@ -34,13 +49,16 @@
         
         async function testEndpoint(endpoint) {
             try {
+                const backendUrl = getBackendUrl();
                 displayResult(`Fetching ${backendUrl}${endpoint}...`);
                 
                 const response = await fetch(`${backendUrl}${endpoint}`, {
                     method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json'
-                    }
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
                 });
                 
                 const headers = {};
@@ -68,13 +86,15 @@
         
         async function testOptions(endpoint) {
             try {
+                const backendUrl = getBackendUrl();
                 displayResult(`Sending OPTIONS to ${backendUrl}${endpoint}...`);
                 
                 const response = await fetch(`${backendUrl}${endpoint}`, {
                     method: 'OPTIONS',
                     headers: {
+                        'Origin': window.location.origin,
                         'Access-Control-Request-Method': 'GET',
-                        'Access-Control-Request-Headers': 'Content-Type'
+                        'Access-Control-Request-Headers': 'Content-Type,Accept'
                     }
                 });
                 
@@ -86,7 +106,8 @@
                 const result = {
                     status: response.status,
                     statusText: response.statusText,
-                    headers: headers
+                    headers: headers,
+                    cors_allowed: headers['access-control-allow-origin'] ? 'Yes' : 'No'
                 };
                 
                 displayResult(result);
@@ -97,13 +118,16 @@
         
         async function testPost(endpoint) {
             try {
+                const backendUrl = getBackendUrl();
                 displayResult(`Posting to ${backendUrl}${endpoint}...`);
                 
                 const response = await fetch(`${backendUrl}${endpoint}`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         goal: "Test goal",
                         modelSettings: {

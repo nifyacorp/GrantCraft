@@ -109,14 +109,14 @@ This checklist will help you deploy working GrantCraft services to Cloud Run, ad
    docker push gcr.io/YOUR_PROJECT_ID/grantcraft-backend
    ```
 
-3. Deploy to Cloud Run:
+3. Deploy to Cloud Run with CORS settings:
    ```bash
    gcloud run deploy grantcraft-backend \
      --image gcr.io/YOUR_PROJECT_ID/grantcraft-backend \
      --platform managed \
      --region us-central1 \
      --allow-unauthenticated \
-     --update-env-vars "LOG_LEVEL=DEBUG,REWORKD_PLATFORM_HOST=0.0.0.0,REWORKD_PLATFORM_PORT=8000"
+     --update-env-vars "LOG_LEVEL=DEBUG,REWORKD_PLATFORM_HOST=0.0.0.0,REWORKD_PLATFORM_PORT=8000,REWORKD_PLATFORM_FRONTEND_URL=https://grantcraft-frontend-320165158819.us-central1.run.app,https://grantcraft.ai,http://localhost:3000"
    ```
 
 ## Verify Deployment
@@ -149,6 +149,12 @@ If you continue to experience issues:
    - Check Cloud Run logs for the backend service
    - Verify the FastAPI application is starting properly
    - Make sure the entrypoint script is executing correctly
+
+3. **CORS Issues**:
+   - Use the debug tool: `/debug-tools/cors-test.html` to test CORS settings
+   - Check if the backend is returning the proper CORS headers
+   - If problems persist, try the temporary fix: set `REWORKD_PLATFORM_FRONTEND_URL=*`
+   - Verify that the frontend URL in CORS settings matches exactly (https:// included)
 
 3. **Database Connection Issues**:
    - Check database connectivity from the backend

@@ -49,6 +49,19 @@ async def ping():
     """Simple ping endpoint that returns pong"""
     return {"ping": "pong"}
 
+@router.options("/cors-test")
+@router.get("/cors-test")
+async def cors_test(request: Request):
+    """Test endpoint for CORS configuration"""
+    origin = request.headers.get("origin", "No origin header")
+    return {
+        "cors_test": "success",
+        "your_origin": origin,
+        "server_time": datetime.utcnow().isoformat(),
+        "headers_received": dict(request.headers),
+        "allowed_by": "*"  # We're allowing all origins temporarily
+    }
+
 @router.get("/errors")
 async def get_errors(password: str = None):
     """Get recent errors - protected with a simple password"""
