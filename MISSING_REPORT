@@ -1,0 +1,123 @@
+# GrantCraft Documentation Review and Implementation Gap Analysis
+
+This document synthesizes a review of the provided GrantCraft documentation files, proposes necessary revisions for consistency, and identifies gaps in specifications or implementation details based *solely* on the provided documents.
+
+## 1. Proposed Consolidated Project Structure
+
+The structure outlined in `STRUCTURE.MD` is the most detailed and consistent with the individual service READMEs. It should be adopted as the canonical structure.
+ 
+grant-craft/
+├── services/ # Backend microservices
+│ ├── api-gateway/
+│ │ ├── app/ # Service code (e.g., FastAPI app)
+│ │ ├── tests/ # Unit/integration tests
+│ │ └── Dockerfile # Container definition
+│ ├── user-service/
+│ │ ├── app/
+│ │ ├── tests/
+│ │ └── Dockerfile
+│ ├── project-service/
+│ │ ├── app/
+│ │ ├── tests/
+│ │ └── Dockerfile
+│ ├── chat-service/
+│ │ ├── app/
+│ │ ├── tests/
+│ │ └── Dockerfile
+│ ├── agent-service/
+│ │ ├── app/
+│ │ │ ├── tools/ # Implementations of AI tools
+│ │ │ └── prompts/ # Prompt templates and management
+│ │ ├── tests/
+│ │ └── Dockerfile
+│ ├── file-service/
+│ │ ├── app/
+│ │ ├── tests/
+│ │ └── Dockerfile
+│ ├── task-service/
+│ │ ├── app/
+│ │ ├── tests/
+│ │ └── Dockerfile
+│ └── ... (potential future services: notification, search, etc.)
+│
+├── frontend/ # Frontend application
+│ ├── src/ # Next.js source code
+│ ├── public/ # Static assets
+│ ├── package.json
+│ ├── next.config.js
+│ └── Dockerfile # Container definition
+│
+├── shared/ # Shared code/types across services
+│ ├── libs/ # Shared libraries (e.g., common utils)
+│ └── types/ # Shared data structures (e.g., Pydantic models, TypeScript types)
+│
+├── infrastructure/ # Infrastructure as Code (IaC)
+│ ├── gcp/ # GCP resource definitions (Terraform, Pulumi, etc.)
+│ └── firebase/ # Firebase config (rules, indexes)
+│
+├── docs/ # Project documentation (consolidated and revised)
+│ ├── architecture/ # Overall architecture, service diagrams, ADRs
+│ ├── api/ # OpenAPI specs, data model definitions
+│ ├── design/ # UI/UX mockups, flows
+│ ├── guides/ # Setup, deployment, user guides
+│ └── planning/ # Plans, feature lists, requirements
+│
+├── .gitignore
+├── README.md # Main project readme (updated)
+└── poetry.lock # (If using Poetry for Python services)
+└── pyproject.toml # (If using Poetry for Python services)
+└── package.json # (For monorepo tooling like Lerna/Nx, if used)
+
+## 2. Documentation Revisions and Harmonization Needed
+
+*   **Consolidate Architecture Docs:**
+    *   Merge the relevant architectural content from `ProjectStructure.md` and `GCPRebuildPlan.md` into a primary architecture document within `docs/architecture/`.
+    *   Update the diagram in the primary architecture document to match the detailed service breakdown in `STRUCTURE.MD`.
+    *   Ensure `README.md` and `README-services.md` reference this primary document.
+*   **Standardize Data Models:**
+    *   The data models presented in `execution-plan.md` (TypeScript interfaces) and `ProjectStructure.md` (TypeScript interfaces) are detailed.
+    *   The Firestore schemas described in `README-chat-service.md`, `README-file-service.md`, and `ProjectStructure.md` (under Firestore) need to be strictly aligned with these TypeScript interfaces.
+    *   A single source of truth for data models should reside in `docs/api/` or `shared/types/`, potentially using Pydantic models for the backend and generating TypeScript types from them. All documents referencing models should point to this source.
+*   **Align API Endpoints:**
+    *   API endpoints listed in `execution-plan.md` and `README-chat-service.md` (and implied for other services) need to be consolidated into a formal API specification (e.g., OpenAPI) within `docs/api/`.
+    *   The responsibility for `/chats/{chatId}/tools` endpoints mentioned in `execution-plan.md` should be clarified. `README-chat-service.md` correctly suggests these likely belong to `AgentService` or `ToolService` (which seems synonymous with `AgentService`'s tool responsibilities). This needs to be consistent everywhere.
+*   **Update Root README:**
+    *   The main `README.md` should reflect the `STRUCTURE.MD` folder layout accurately.
+*   **Relocate Documentation:**
+    *   Move existing `.md` files into the proposed `docs/` subdirectories as outlined in `README-docs.md`. For example:
+        *   `STRUCTURE.MD`, `ProjectStructure.md` -> `docs/architecture/`
+        *   `AI-TOOLS.MD` -> `docs/planning/` or `docs/architecture/`
+        *   `execution-plan.md`, `GCPRebuildPlan.md` -> `docs/planning/`
+        *   `GETTING-STARTED.md` -> `docs/guides/`
+        *   Service READMEs (like `README-chat-service.md`) should remain in their respective service/frontend/shared/infrastructure directories but could be referenced from `docs/`.
+*   **Clarify Tool Implementation:**
+    *   `AI-TOOLS.MD` provides Python class structures. Clarify that the `AgentService` is responsible for instantiating and orchestrating these tools, and that the tool implementations themselves reside within `services/agent-service/app/tools/`.
+*   **Harmonize MVP Definition:** Ensure the MVP scope defined in `execution-plan.md` (e.g., only Document Generation tool, Google Sign-In) is consistently reflected in other documents mentioning features or authentication. `GCPRebuildPlan.md` mentions "File Creation" as the MVP tool, which should be aligned with "Document Generation".
+
+## 3. Identified Implementation Gaps & Missing Specifications (Based on Docs)
+
+This expands upon `REMAINING_IMPLEMENTATION.md`, focusing on gaps evident from the documentation set:
+
+*   **Missing Service READMEs/Specifications:** Detailed READMEs defining responsibilities, APIs, and data interactions are missing for:
+    *   `services/api-gateway/`
+    *   `services/user-service/`
+    *   `services/project-service/`
+    *   `services/task-service/`
+    *   `services/agent-service/` (Crucially, detailing internal API calls, Vertex AI interaction specifics, prompt management implementation, and `ToolRouter` logic beyond the schema generation in `AI-TOOLS.MD`).
+*   **Missing Core Code Implementation:** As noted in `REMAINING_IMPLEMENTATION.md`, the actual application code (`app/` directories within services, `src/` in frontend) implementing the described features is assumed to be largely absent or incomplete.
+*   **Formal API Specifications:** Lack of formal OpenAPI specifications for inter-service communication and the main backend API exposed via the gateway. Endpoint definitions are scattered and potentially inconsistent.
+*   **Shared Code Implementation & Strategy:**
+    *   The `shared/` directory is proposed, but the actual shared types (Pydantic/TypeScript) and libraries (`libs/`) need implementation.
+    *   The *strategy* for how services/frontend will consume this shared code (monorepo tooling, private packages, etc.) needs to be defined and implemented (`README-shared.md`).
+*   **AI Tool Implementation Details:**
+    *   `AI-TOOLS.MD` provides class structures and schemas but lacks the detailed implementation logic for interacting with Vertex AI (specific API calls, prompt construction based on inputs, response parsing, error handling) for each tool's methods.
+    *   The `FileManagementTool`'s relationship with `FileService` needs concrete implementation details (how the tool calls the service API).
+    *   Image Generation Tool specifics (which Vertex AI model - Imagen?, how prompts are used, how generated image data/URLs are handled) are missing.
+*   **Infrastructure as Code (IaC):** The actual IaC code (Terraform/Pulumi/etc.) in `infrastructure/` is likely missing or incomplete.
+*   **CI/CD Pipeline Definitions:** Concrete definitions for build, test, and deployment pipelines (e.g., `cloudbuild.yaml` files) are missing.
+*   **Detailed Error Handling Strategy:** While mentioned (`execution-plan.md`), the specific standardized error models and handling mechanisms across services need definition and implementation details.
+*   **Testing Strategy Implementation:** Concrete test harnesses, base test classes, mocking strategies, and actual tests (unit, integration, e2e) are not documented as implemented.
+*   **Frontend State Management:** The specific state management library and its implementation strategy (`README-frontend.md`) need to be finalized and implemented.
+*   **Real-time Implementation:** Details on how real-time updates (e.g., for chat) would be implemented (WebSockets, Firestore listeners) are missing.
+*   **Secrets Integration Details:** Specific code examples or patterns for how each service accesses necessary secrets from Secret Manager are missing from service documentation.
+*   **Monitoring/Alerting Configuration:** Specific metrics to track, log formats, and alert policy configurations need detailed definition beyond the examples in `GETTING-STARTED.md`.

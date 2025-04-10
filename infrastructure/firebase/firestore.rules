@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(resource) {
+      return resource.data.ownerId == request.auth.uid;
+    }
+    
+    function isCollaborator(resource) {
+      return resource.data.collaborators.hasAny([{'userId': request.auth.uid}]);
+    }
+    
+    function hasProjectAccess(projectId) {
+      let project = get(/databases/$(database)/documents/projects/$(projectId));
+      return isOwner(project) || isCollaborator(project);
+    }
+    
+    // User profiles
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId);
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && request.auth.uid == userId;
+      allow delete: if false; // Prevent user deletion
+    }
+    
+    // Projects
+    match /projects/{projectId} {
+      allow read: if isSignedIn() && (isOwner(resource) || isCollaborator(resource));
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isSignedIn() && isOwner(resource);
+      allow delete: if isSignedIn() && isOwner(resource);
+    }
+    
+    // Chats
+    match /chats/{chatId} {
+      allow read, write: if isSignedIn() && hasProjectAccess(resource.data.projectId);
+    }
+    
+    // Messages
+    match /messages/{messageId} {
+      allow read, write: if isSignedIn() && hasProjectAccess(get(/databases/$(database)/documents/chats/$(resource.data.chatId)).data.projectId);
+    }
+    
+    // Tasks
+    match /tasks/{taskId} {
+      allow read, write: if isSignedIn() && hasProjectAccess(resource.data.projectId);
+    }
+    
+    // Files
+    match /files/{fileId} {
+      allow read, write: if isSignedIn() && hasProjectAccess(resource.data.projectId);
+    }
+  }
+} 

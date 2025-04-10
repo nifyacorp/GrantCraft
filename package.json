@@ -1,0 +1,20 @@
+{
+  "name": "grancraft",
+  "version": "1.0.0",
+  "description": "An AI-powered grant writing assistant built on Google Cloud",
+  "scripts": {
+    "dev": "npm run dev:frontend",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "start": "npm run start:frontend",
+    "start:frontend": "cd frontend && npm run start",
+    "deploy": "gcloud builds submit --config cloudbuild.yaml .",
+    "deploy:frontend": "cd frontend && gcloud run deploy frontend --source ."
+  },
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 
