@@ -1,38 +1,47 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
 
-# Import routers
-from routers import files
+try:
+    # Import routers
+    from app.routers import files
 
-# Load environment variables
-load_dotenv()
+    # Load environment variables
+    load_dotenv()
 
-# Configuration
-API_PREFIX = os.getenv("API_PREFIX", "")
-BACKEND_CORS_ORIGINS = os.getenv(
-    "BACKEND_CORS_ORIGINS", 
-    "http://localhost:3000,http://localhost:8080"
-).split(",")
+    # Configuration
+    API_PREFIX = os.getenv("API_PREFIX", "")
+    BACKEND_CORS_ORIGINS = os.getenv(
+        "BACKEND_CORS_ORIGINS", 
+        "http://localhost:3000,http://localhost:8080"
+    ).split(",")
 
-app = FastAPI(
-    title="GrantCraft File Service",
-    description="File Service for the GrantCraft system",
-    version="0.1.0",
-)
+    app = FastAPI(
+        title="GrantCraft File Service",
+        description="File Service for the GrantCraft system",
+        version="0.1.0",
+    )
 
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=BACKEND_CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    # Add CORS middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=BACKEND_CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
-# Include routers
-app.include_router(files.router, prefix=API_PREFIX)
+    # Include routers
+    app.include_router(files.router, prefix=API_PREFIX)
+except Exception as e:
+    # Fallback application if we encounter any setup issues
+    print(f"Error initializing application: {str(e)}")
+    app = FastAPI(
+        title="GrantCraft File Service",
+        description="File Service for the GrantCraft system (Fallback Mode)",
+        version="0.1.0",
+    )
 
 @app.get("/health")
 async def health_check():

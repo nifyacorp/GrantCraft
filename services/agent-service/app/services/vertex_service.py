@@ -39,16 +39,32 @@ class VertexService:
         self.project_id = project_id
         self.location = location
         self.model_name = model_name
-        self.endpoint = f"https://{location}-aiplatform.googleapis.com/v1/projects/{project_id}/locations/{location}/publishers/google/models/{model_name}:generateContent"
+        self.endpoint = None
         
+        # Check if project_id is empty
+        if not project_id:
+            logging.error("Project ID is empty. Using mock Vertex AI service.")
+            return
+            
         # Initialize Vertex AI client
         try:
             aiplatform.init(project=project_id, location=location)
-            self.endpoint = aiplatform.Endpoint(f"projects/{project_id}/locations/{location}/publishers/google/models/{model_name}")
-            logging.info(f"Initialized Vertex AI client for model {model_name}")
+            
+            # More robust endpoint initialization
+            endpoint_path = f"projects/{project_id}/locations/{location}/publishers/google/models/{model_name}"
+            logging.info(f"Initializing Vertex AI client with endpoint: {endpoint_path}")
+            
+            try:
+                self.endpoint = aiplatform.Endpoint(endpoint_path)
+                logging.info(f"Successfully initialized Vertex AI client for model {model_name}")
+            except ValueError as e:
+                logging.error(f"Invalid endpoint path: {endpoint_path}. Error: {str(e)}")
+                logging.warning("Using fallback to direct API calls instead of Endpoint object")
+                self.endpoint = None
+                
         except Exception as e:
             logging.error(f"Failed to initialize Vertex AI client: {str(e)}")
-            raise
+            self.endpoint = None
     
     async def generate_text(self, prompt: str, max_tokens: int = 1024) -> str:
         """
@@ -61,6 +77,10 @@ class VertexService:
         Returns:
             Generated text
         """
+        if not self.endpoint:
+            logging.warning("Vertex AI client not initialized. Returning fallback response.")
+            return f"Error: Vertex AI service not properly initialized. Prompt was: {prompt[:100]}..."
+            
         try:
             # Create the request
             instance = {"prompt": prompt}
@@ -99,6 +119,10 @@ class VertexService:
         Returns:
             Structured content as a dictionary
         """
+        if not self.endpoint:
+            logging.warning("Vertex AI client not initialized. Returning empty structured response.")
+            return {}
+            
         try:
             # Create the request with function calling
             instance = {

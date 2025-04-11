@@ -2,10 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  swcMinify: false,
-  compiler: {
-    // Disable SWC as replacement for Babel
-    styledComponents: false
+  experimental: {
+    forceSwcTransforms: true
   },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
@@ -18,7 +16,12 @@ const nextConfig = {
   },
   images: {
     domains: ['lh3.googleusercontent.com', 'storage.googleapis.com']
-  }
+  },
+  // Add support for port 8080 used by Cloud Run
+  serverRuntimeConfig: {
+    port: process.env.PORT || 8080
+  },
+  poweredByHeader: false
 };
 
 module.exports = nextConfig; 

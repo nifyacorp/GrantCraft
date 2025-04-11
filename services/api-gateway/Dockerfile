@@ -8,11 +8,14 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY app/ .
+# Copy application code (keep directory structure)
+COPY app/ app/
 
-# Expose port
-EXPOSE 8000
+# Set environment variables
+ENV PORT=8080
 
-# Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"] 
+# Expose port for Cloud Run
+EXPOSE 8080
+
+# Run the application with correct module path and PORT variable
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"] 

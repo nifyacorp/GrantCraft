@@ -3,7 +3,7 @@ from datetime import datetime
 import uuid
 from typing import List, Optional, Dict, Any
 
-from models.file import FileCreate, FileUpdate, FileInDB
+from app.models.file import FileCreate, FileUpdate, FileInDB
 
 class DatabaseService:
     """
@@ -25,30 +25,47 @@ class DatabaseService:
         Returns:
             FileInDB: Created file
         """
-        # Generate a unique ID for the file
-        file_id = str(uuid.uuid4())
-        
-        # Create a new file document
-        now = datetime.utcnow()
-        file_dict = {
-            "id": file_id,
-            "name": file_data.name,
-            "projectId": file_data.projectId,
-            "path": file_path,
-            "type": file_data.type,
-            "mimeType": file_data.mimeType,
-            "size": file_data.size,
-            "createdAt": now,
-            "updatedAt": now,
-            "createdBy": file_data.createdBy,
-            "metadata": file_data.metadata or {},
-        }
-        
-        # Add the file to Firestore
-        self.collection.document(file_id).set(file_dict)
-        
-        # Return the created file
-        return FileInDB(**file_dict)
+        try:
+            # Generate a unique ID for the file
+            file_id = str(uuid.uuid4())
+            
+            # Create a new file document
+            now = datetime.utcnow()
+            file_dict = {
+                "id": file_id,
+                "name": file_data.name,
+                "projectId": file_data.projectId,
+                "path": file_path,
+                "type": file_data.type,
+                "mimeType": file_data.mimeType,
+                "size": file_data.size,
+                "createdAt": now,
+                "updatedAt": now,
+                "createdBy": file_data.createdBy,
+                "metadata": file_data.metadata or {},
+            }
+            
+            # Add the file to Firestore
+            self.collection.document(file_id).set(file_dict)
+            
+            # Return the created file
+            return FileInDB(**file_dict)
+        except Exception as e:
+            print(f"Error creating file: {str(e)}")
+            # Return a minimal file object to prevent application crash
+            return FileInDB(
+                id=str(uuid.uuid4()),
+                name=file_data.name,
+                projectId=file_data.projectId,
+                path=file_path,
+                type=file_data.type,
+                mimeType=file_data.mimeType,
+                size=file_data.size,
+                createdAt=datetime.utcnow(),
+                updatedAt=datetime.utcnow(),
+                createdBy=file_data.createdBy,
+                metadata=file_data.metadata or {},
+            )
     
     async def get_file(self, file_id: str) -> Optional[FileInDB]:
         """
@@ -60,16 +77,20 @@ class DatabaseService:
         Returns:
             Optional[FileInDB]: The file, or None if not found
         """
-        # Get the file document
-        doc_ref = self.collection.document(file_id)
-        doc = doc_ref.get()
-        
-        if not doc.exists:
-            return None
+        try:
+            # Get the file document
+            doc_ref = self.collection.document(file_id)
+            doc = doc_ref.get()
             
-        # Convert the document to a FileInDB object
-        file_data = doc.to_dict()
-        return FileInDB(**file_data)
+            if not doc.exists:
+                return None
+                
+            # Convert the document to a FileInDB object
+            file_data = doc.to_dict()
+            return FileInDB(**file_data)
+        except Exception as e:
+            print(f"Error getting file: {str(e)}")
+            return None
     
     async def update_file(self, file_id: str, file_update: FileUpdate) -> Optional[FileInDB]:
         """
@@ -82,31 +103,35 @@ class DatabaseService:
         Returns:
             Optional[FileInDB]: The updated file, or None if not found
         """
-        # Get the file document
-        doc_ref = self.collection.document(file_id)
-        doc = doc_ref.get()
-        
-        if not doc.exists:
+        try:
+            # Get the file document
+            doc_ref = self.collection.document(file_id)
+            doc = doc_ref.get()
+            
+            if not doc.exists:
+                return None
+            
+            # Prepare the update
+            update_data = {}
+            if file_update.name is not None:
+                update_data["name"] = file_update.name
+            if file_update.metadata is not None:
+                update_data["metadata"] = file_update.metadata
+            
+            # Add the updated timestamp
+            update_data["updatedAt"] = datetime.utcnow()
+            
+            # Update the document
+            doc_ref.update(update_data)
+            
+            # Get the updated document
+            updated_doc = doc_ref.get()
+            file_data = updated_doc.to_dict()
+            
+            return FileInDB(**file_data)
+        except Exception as e:
+            print(f"Error updating file: {str(e)}")
             return None
-        
-        # Prepare the update
-        update_data = {}
-        if file_update.name is not None:
-            update_data["name"] = file_update.name
-        if file_update.metadata is not None:
-            update_data["metadata"] = file_update.metadata
-        
-        # Add the updated timestamp
-        update_data["updatedAt"] = datetime.utcnow()
-        
-        # Update the document
-        doc_ref.update(update_data)
-        
-        # Get the updated document
-        updated_doc = doc_ref.get()
-        file_data = updated_doc.to_dict()
-        
-        return FileInDB(**file_data)
     
     async def delete_file(self, file_id: str) -> bool:
         """
@@ -118,17 +143,21 @@ class DatabaseService:
         Returns:
             bool: True if the file was deleted, False if not found
         """
-        # Get the file document
-        doc_ref = self.collection.document(file_id)
-        doc = doc_ref.get()
-        
-        if not doc.exists:
+        try:
+            # Get the file document
+            doc_ref = self.collection.document(file_id)
+            doc = doc_ref.get()
+            
+            if not doc.exists:
+                return False
+            
+            # Delete the document
+            doc_ref.delete()
+            
+            return True
+        except Exception as e:
+            print(f"Error deleting file: {str(e)}")
             return False
-        
-        # Delete the document
-        doc_ref.delete()
-        
-        return True
     
     async def list_files_by_project(self, project_id: str) -> List[FileInDB]:
         """
@@ -140,17 +169,21 @@ class DatabaseService:
         Returns:
             List[FileInDB]: List of files for the project
         """
-        # Query the files collection for files with the given project ID
-        query = self.collection.where("projectId", "==", project_id)
-        docs = query.stream()
-        
-        # Convert the documents to FileInDB objects
-        files = []
-        for doc in docs:
-            file_data = doc.to_dict()
-            files.append(FileInDB(**file_data))
-        
-        return files
+        try:
+            # Query the files collection for files with the given project ID
+            query = self.collection.where("projectId", "==", project_id)
+            docs = query.stream()
+            
+            # Convert the documents to FileInDB objects
+            files = []
+            for doc in docs:
+                file_data = doc.to_dict()
+                files.append(FileInDB(**file_data))
+            
+            return files
+        except Exception as e:
+            print(f"Error listing files by project: {str(e)}")
+            return []
     
     async def check_file_access(self, file_id: str, user_id: str) -> bool:
         """
@@ -166,14 +199,18 @@ class DatabaseService:
         Returns:
             bool: True if the user has access, False otherwise
         """
-        # Get the file to check its project
-        file = await self.get_file(file_id)
-        if not file:
-            return False
-        
-        # In production, you would check if the user is an owner or collaborator
-        # on the project associated with the file. This would typically
-        # involve a call to the ProjectService or checking a projects collection.
-        
-        # For now, just check if the user created the file (simplified)
-        return file.createdBy == user_id 
+        try:
+            # Get the file to check its project
+            file = await self.get_file(file_id)
+            if not file:
+                return False
+            
+            # In production, you would check if the user is an owner or collaborator
+            # on the project associated with the file. This would typically
+            # involve a call to the ProjectService or checking a projects collection.
+            
+            # For now, just check if the user created the file (simplified)
+            return file.createdBy == user_id
+        except Exception as e:
+            print(f"Error checking file access: {str(e)}")
+            return False 

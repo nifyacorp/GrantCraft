@@ -46,11 +46,24 @@ def load_config() -> Dict[str, Any]:
     Returns:
         Configuration dictionary
     """
+    # Get port from environment for Cloud Run compatibility
+    port = os.environ.get("PORT", "8000")
+    logging.info(f"Using PORT from environment: {port}")
+    
+    # Get the project ID from environment
+    project_id = os.environ.get("GCP_PROJECT_ID", "")
+    if not project_id:
+        logging.warning("GCP_PROJECT_ID environment variable is not set. Some features may not work properly.")
+    
     config = {
-        "project_id": os.environ.get("GCP_PROJECT_ID", ""),
+        "project_id": project_id,
         "location": os.environ.get("GCP_LOCATION", "us-central1"),
         "model_name": os.environ.get("VERTEX_MODEL", "gemini-1.0-pro"),
+        "port": int(port)
     }
+    
+    # Log all configuration keys (without sensitive values)
+    logging.info(f"Configuration keys: {', '.join(config.keys())}")
     
     # Check if config file exists
     config_path = os.environ.get("CONFIG_PATH", "config.json")
@@ -59,6 +72,7 @@ def load_config() -> Dict[str, Any]:
             with open(config_path, "r") as f:
                 file_config = json.load(f)
                 config.update(file_config)
+                logging.info(f"Loaded configuration from {config_path}")
         except Exception as e:
             logging.error(f"Error loading config file: {str(e)}")
     
@@ -71,9 +85,15 @@ agent_handler = None
 async def startup_event():
     """Initialize the agent handler on startup."""
     global agent_handler
-    config = load_config()
-    agent_handler = AgentHandler(config)
-    logging.info("Agent handler initialized")
+    try:
+        config = load_config()
+        agent_handler = AgentHandler(config)
+        logging.info("Agent handler initialized successfully")
+    except Exception as e:
+        logging.error(f"Failed to initialize agent handler: {str(e)}")
+        # Don't raise the exception, just log it
+        # The app will continue to run with agent_handler as None,
+        # and endpoints will return appropriate error messages
 
 # Define request model
 class AgentRequest(BaseModel):
@@ -116,7 +136,7 @@ async def health_check():
     Returns:
         Health status
     """
-    return {"status": "healthy"}
+    return {"status": "healthy", "agent_handler_initialized": agent_handler is not None}
 
 @app.get("/api/agent/tools")
 async def list_tools():
@@ -128,7 +148,7 @@ async def list_tools():
     """
     global agent_handler
     if not agent_handler:
-        raise HTTPException(status_code=500, detail="Agent handler not initialized")
+        return {"status": "error", "message": "Agent handler not initialized", "tools": []}
     
     return {"tools": list(agent_handler.tools.keys())}
 
@@ -136,5 +156,9 @@ async def list_tools():
 if __name__ == "__main__":
     import uvicorn
     
+    # Get port from config
+    config = load_config()
+    port = config.get("port", 8000)
+    
     # Run the application
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=True) 

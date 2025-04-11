@@ -3,10 +3,10 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import json
 
-from services.database import DatabaseService
-from services.storage import StorageService
-from services.auth import get_current_user
-from models.file import FileCreate, FileUpdate, File, FileUploadResponse, FileDownloadResponse
+from app.services.database import DatabaseService
+from app.services.storage import StorageService
+from app.services.auth import get_current_user
+from app.models.file import FileCreate, FileUpdate, File, FileUploadResponse, FileDownloadResponse
 
 router = APIRouter(prefix="/files", tags=["files"])
 
